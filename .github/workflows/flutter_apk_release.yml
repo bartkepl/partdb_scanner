@@ -46,4 +46,6 @@ jobs:
         with:
           tag: latest
           name: PartDB Scanner Rolling Release
-          files: build/apk/partdb_scanner.apk
+          makeLatest: true
+          artifacts: build/apk/partdb_scanner.apk
+          token: ${{ secrets.GITHUB_TOKEN }}
