@@ -11,6 +11,9 @@ jobs:
     name: Build Flutter APK and Upload to Release
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      
     steps:
       # 1️⃣ Pobranie kodu
       - name: Checkout code
@@ -20,7 +23,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          version: 3.13.6
+          flutter-version: 3.13.6
 
       # 3️⃣ Wyłączenie telemetry (opcjonalne)
       - name: Disable Flutter telemetry
