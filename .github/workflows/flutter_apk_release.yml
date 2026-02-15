@@ -16,27 +16,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Instalacja Flutter
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.13.6'
+      # 2️⃣ Instalacja Flutter ręcznie (Flutter 3.13.6 + Dart 3.9.x)
+      - name: Install Flutter manually
+        run: |
+          wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.13.6-stable.tar.xz
+          tar xf flutter_linux_3.13.6-stable.tar.xz
+          echo "$PWD/flutter/bin" >> $GITHUB_PATH
+          flutter --version
 
-      # 3️⃣ Pobranie zależności
+      # 3️⃣ Wyłączenie telemetry (opcjonalne)
+      - name: Disable Flutter telemetry
+        run: flutter config --no-analytics
+
+      # 4️⃣ Pobranie zależności
       - name: Install dependencies
         run: flutter pub get
 
-      # 4️⃣ Build APK release
+      # 5️⃣ Build APK release
       - name: Build APK
         run: flutter build apk --release
 
-      # 5️⃣ Przygotowanie pliku z ustaloną nazwą
+      # 6️⃣ Przygotowanie pliku z ustaloną nazwą
       - name: Rename APK
         run: |
           mkdir -p build/apk
           cp build/app/outputs/flutter-apk/app-release.apk build/apk/partdb_scanner.apk
 
-      # 6️⃣ Utworzenie lub aktualizacja release "latest" i upload APK
+      # 7️⃣ Utworzenie lub aktualizacja release "latest" i upload APK
       - name: Publish APK to GitHub Release
         uses: ncipollo/release-action@v1
         with:
