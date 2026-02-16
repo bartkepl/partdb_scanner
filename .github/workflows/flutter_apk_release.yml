@@ -1,4 +1,4 @@
-name: Flutter APK Rolling Release
+name: Flutter APK Auto Version Release
 
 on:
   push:
@@ -8,47 +8,79 @@ on:
 
 jobs:
   build_and_release:
-    name: Build Flutter APK and Upload to Release
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
-      
-    steps:
-      # 1️⃣ Pobranie kodu
-      - name: Checkout code
-        uses: actions/checkout@v3
 
-      # 2️⃣ Instalacja Flutter ręcznie (Flutter 3.13.6 + Dart 3.9.x)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           version: 3.13.6
 
-      # 3️⃣ Wyłączenie telemetry (opcjonalne)
-      - name: Disable Flutter telemetry
-        run: flutter config --no-analytics
-
-      # 4️⃣ Pobranie zależności
       - name: Install dependencies
         run: flutter pub get
 
-      # 5️⃣ Build APK release
+      # 🔥 Pobranie ostatniego taga
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          git fetch --tags
+          latestTag=$(git tag --sort=-v:refname | head -n 1)
+          echo "Latest tag: $latestTag"
+          echo "tag=$latestTag" >> $GITHUB_OUTPUT
+
+      # 🔥 Obliczenie nowej wersji
+      - name: Calculate next version
+        id: version
+        run: |
+          latest=${{ steps.get_tag.outputs.tag }}
+
+          if [ -z "$latest" ]; then
+            newTag="v0.2.4"
+          else
+            version=${latest#v}
+            IFS='.' read -r major minor patch <<< "$version"
+            patch=$((patch + 1))
+            newTag="v$major.$minor.$patch"
+          fi
+
+          echo "newTag=$newTag"
+          echo "newTag=$newTag" >> $GITHUB_OUTPUT
+
+      # 🔥 Update pubspec.yaml
+      - name: Update pubspec version
+        run: |
+          version=${{ steps.version.outputs.newTag }}
+          cleanVersion=${version#v}
+          sed -i "s/^version:.*/version: $cleanVersion+1/" pubspec.yaml
+
       - name: Build APK
         run: flutter build apk --release
 
-      # 6️⃣ Przygotowanie pliku z ustaloną nazwą
-      - name: Rename APK
+      - name: Prepare APK
         run: |
           mkdir -p build/apk
           cp build/app/outputs/flutter-apk/app-release.apk build/apk/partdb_scanner.apk
 
-      # 7️⃣ Utworzenie lub aktualizacja release "latest" i upload APK
-      - name: Publish APK to GitHub Release
+      # 🔥 Tworzenie taga
+      - name: Create Tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git tag ${{ steps.version.outputs.newTag }}
+          git push origin ${{ steps.version.outputs.newTag }}
+
+      # 🔥 Release
+      - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          tag: latest
-          name: PartDB Scanner Rolling Release
-          makeLatest: true
+          tag: ${{ steps.version.outputs.newTag }}
+          name: PartDB Scanner ${{ steps.version.outputs.newTag }}
           artifacts: build/apk/partdb_scanner.apk
           token: ${{ secrets.GITHUB_TOKEN }}
