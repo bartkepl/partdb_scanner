@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:upgrader/upgrader.dart';
 import 'services/api_service.dart';
 import 'pages/scanner_page.dart';
 import 'pages/config_page.dart';
@@ -38,13 +39,6 @@ class MyApp extends StatelessWidget {
             foregroundColor: Colors.white,
             elevation: 1,
           ),
-          // cardTheme: CardTheme(
-          //   color: const Color(0xFF1E1E1E),
-          //   elevation: 2,
-          //   margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
-          //   shape:
-          //   RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          // ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
@@ -56,7 +50,22 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: HomePage(apiService: apiService),
+        home: UpgradeAlert(
+          upgrader: Upgrader(
+            debugLogging: true,
+            debugDisplayAlways: false,
+            durationUntilAlertAgain: const Duration(days: 0),
+
+            // 🔥 Sprawdzanie z GitHub:
+            storeController: UpgraderStoreController(
+              onAndroid: () => UpgraderAppcastStore(
+                appcastURL:
+                'https://github.com/bartkepl/partdb_scanner/releases/latest',
+              ),
+            ),
+          ),
+          child: HomePage(apiService: apiService),
+        ),
       ),
     );
   }
@@ -104,3 +113,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

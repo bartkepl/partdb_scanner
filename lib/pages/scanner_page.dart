@@ -2,15 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 import '../services/api_service.dart';
-import '../models/part.dart';
 import '../pages/part_detail_page.dart';
 
 class ScannerPage extends StatefulWidget {
   final ApiService apiService;
-  const ScannerPage({required this.apiService, Key? key}) : super(key: key);
+  const ScannerPage({required this.apiService, super.key});
 
   @override
   State<ScannerPage> createState() => _ScannerPageState();
@@ -20,9 +17,9 @@ class _ScannerPageState extends State<ScannerPage> {
   CameraController? _cameraController;
   late BarcodeScanner _barcodeScanner;
   bool _processing = false;
-  bool _captureRequested = false;
+  final bool _captureRequested = false;
   String _status = 'Gotowy do skanowania';
-  double _zoom = 2.0; // 🔍 domyślny zoom x2
+  final double _zoom = 2.0; // 🔍 domyślny zoom x2
 
   @override
   void initState() {
