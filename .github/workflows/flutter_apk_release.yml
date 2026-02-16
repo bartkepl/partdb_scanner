@@ -41,9 +41,9 @@ jobs:
         run: |
           latest=${{ steps.get_tag.outputs.tag }}
 
-          if [ -z "$latest" ]; then
-            newTag="v0.2.4"
-          else
+           if [ -z "$latest" ] || [ "$latest" = "latest" ]; then
+             newTag="v0.2.4"
+           else
             version=${latest#v}
             IFS='.' read -r major minor patch <<< "$version"
             patch=$((patch + 1))
