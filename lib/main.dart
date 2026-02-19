@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:upgrader/upgrader.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'services/api_service.dart';
 import 'pages/scanner_page.dart';
 import 'pages/config_page.dart';
 import 'pages/search_page.dart';
+import 'services/update_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,22 +51,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: UpgradeAlert(
-          upgrader: Upgrader(
-            debugLogging: true,
-            debugDisplayAlways: false,
-            durationUntilAlertAgain: const Duration(days: 0),
-
-            // 🔥 Sprawdzanie z GitHub:
-            storeController: UpgraderStoreController(
-              onAndroid: () => UpgraderAppcastStore(
-                appcastURL:
-                'https://github.com/bartkepl/partdb_scanner/releases/latest',
-              ),
-            ),
-          ),
-          child: HomePage(apiService: apiService),
-        ),
+        home: HomePage(apiService: apiService),
       ),
     );
   }
@@ -87,8 +73,60 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _tabs.add(ScannerPage(apiService: widget.apiService));
-    _tabs.add(SearchPage(apiService: widget.apiService)); // 🔍 nowa strona
+    _tabs.add(SearchPage(apiService: widget.apiService));
     _tabs.add(ConfigPage(apiService: widget.apiService));
+
+    _checkUpdate();
+  }
+
+  void _checkUpdate() async {
+    final update = await UpdateService.checkForUpdate();
+
+    if (update != null && mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) {
+          double progress = 0;
+
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: const Text("Aktualizacja dostępna"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("Nowa wersja ${update['tag']}"),
+                    const SizedBox(height: 20),
+                    if (progress > 0)
+                      LinearProgressIndicator(value: progress),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Później"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await UpdateService.downloadAndInstall(
+                        update['apkUrl'],
+                            (p) {
+                          setState(() {
+                            progress = p;
+                          });
+                        },
+                      );
+                    },
+                    child: const Text("Zainstaluj"),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    }
   }
 
   @override
