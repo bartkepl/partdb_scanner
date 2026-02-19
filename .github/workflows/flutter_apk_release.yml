@@ -72,9 +72,6 @@ jobs:
           mkdir -p build/apk
           cp build/app/outputs/flutter-apk/app-release.apk build/apk/partdb_scanner.apk
 
-      # 🔥 Czyszczenie projektu (opcjonalne ale zgodnie z Twoim założeniem)
-      - name: Flutter clean
-        run: flutter clean
 
       # 🔥 Tworzenie taga (bez commitów)
       - name: Create Tag
