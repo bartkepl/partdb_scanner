@@ -41,9 +41,9 @@ jobs:
         run: |
           latest=${{ steps.get_tag.outputs.tag }}
 
-           if [ -z "$latest" ] || [ "$latest" = "latest" ]; then
-             newTag="v0.2.4"
-           else
+          if [ -z "$latest" ]; then
+            newTag="v0.2.4"
+          else
             version=${latest#v}
             IFS='.' read -r major minor patch <<< "$version"
             patch=$((patch + 1))
@@ -53,22 +53,30 @@ jobs:
           echo "newTag=$newTag"
           echo "newTag=$newTag" >> $GITHUB_OUTPUT
 
-      # 🔥 Update pubspec.yaml
-      - name: Update pubspec version
+      # 🔥 Nadpisanie pubspec.yaml tylko w runnerze
+      - name: Update pubspec version (temporary)
         run: |
           version=${{ steps.version.outputs.newTag }}
           cleanVersion=${version#v}
+
+          echo "Setting version to $cleanVersion+1"
           sed -i "s/^version:.*/version: $cleanVersion+1/" pubspec.yaml
 
+      # 🔥 Build z nową wersją
       - name: Build APK
         run: flutter build apk --release
 
+      # 🔥 Przygotowanie APK
       - name: Prepare APK
         run: |
           mkdir -p build/apk
           cp build/app/outputs/flutter-apk/app-release.apk build/apk/partdb_scanner.apk
 
-      # 🔥 Tworzenie taga
+      # 🔥 Czyszczenie projektu (opcjonalne ale zgodnie z Twoim założeniem)
+      - name: Flutter clean
+        run: flutter clean
+
+      # 🔥 Tworzenie taga (bez commitów)
       - name: Create Tag
         run: |
           git config user.name "github-actions"
