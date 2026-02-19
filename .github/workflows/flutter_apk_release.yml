@@ -35,15 +35,15 @@ jobs:
           echo "Latest tag: $latestTag"
           echo "tag=$latestTag" >> $GITHUB_OUTPUT
 
-      # 🔥 Obliczenie nowego taga
+      # 🔥 Obliczenie nowej wersji
       - name: Calculate next version
         id: version
         run: |
           latest=${{ steps.get_tag.outputs.tag }}
 
-          if [ -z "$latest" ] || [ "$latest" = "latest" ]; then
-            newTag="v0.2.4"
-          else
+           if [ -z "$latest" ] || [ "$latest" = "latest" ]; then
+             newTag="v0.2.4"
+           else
             version=${latest#v}
             IFS='.' read -r major minor patch <<< "$version"
             patch=$((patch + 1))
@@ -53,17 +53,12 @@ jobs:
           echo "newTag=$newTag"
           echo "newTag=$newTag" >> $GITHUB_OUTPUT
 
-      # 🔥 Aktualizacja pubspec.yaml z automatycznym versionCode
+      # 🔥 Update pubspec.yaml
       - name: Update pubspec version
         run: |
           version=${{ steps.version.outputs.newTag }}
           cleanVersion=${version#v}
-
-          IFS='.' read -r major minor patch <<< "$cleanVersion"
-          versionCode=$((major*10000 + minor*100 + patch))
-
-          echo "Updating pubspec.yaml to version $cleanVersion+$versionCode"
-          sed -i "s/^version:.*/version: $cleanVersion+$versionCode/" pubspec.yaml
+          sed -i "s/^version:.*/version: $cleanVersion+1/" pubspec.yaml
 
       - name: Build APK
         run: flutter build apk --release
@@ -81,7 +76,7 @@ jobs:
           git tag ${{ steps.version.outputs.newTag }}
           git push origin ${{ steps.version.outputs.newTag }}
 
-      # 🔥 Tworzenie release
+      # 🔥 Release
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
