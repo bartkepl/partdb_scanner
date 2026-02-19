@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../services/api_service.dart';
-
 
 class ConfigPage extends StatefulWidget {
   final ApiService apiService;
@@ -13,19 +13,39 @@ class ConfigPage extends StatefulWidget {
 class _ConfigPageState extends State<ConfigPage> {
   final TextEditingController _urlController = TextEditingController();
   final TextEditingController _tokenController = TextEditingController();
+
+  double _selectedZoom = 2.0;
+
+  final List<double> _zoomLevels = [
+    1.0, 1.25, 1.5, 1.75,
+    2.0, 2.25, 2.5, 2.75,
+    3.0,
+  ];
+
   bool _loading = false;
   bool _tokenHidden = false;
   String _status = '';
+  String _appVersion = '';
 
   @override
   void initState() {
     super.initState();
+    _loadAppVersion();
+
     widget.apiService.loadConfig().then((_) {
       setState(() {
         _urlController.text = widget.apiService.baseUrl;
         _tokenController.text = widget.apiService.token;
         if (_tokenController.text.isNotEmpty) _tokenHidden = true;
       });
+      _selectedZoom = widget.apiService.zoomLevel;
+    });
+  }
+
+  Future<void> _loadAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      _appVersion = '${info.version}+${info.buildNumber}';
     });
   }
 
@@ -40,6 +60,9 @@ class _ConfigPageState extends State<ConfigPage> {
 
     await widget.apiService
         .saveConfig(_urlController.text.trim(), tokenToSave);
+
+    await widget.apiService.saveZoomLevel(_selectedZoom);
+
 
     try {
       final info = await widget.apiService.getCurrentTokenInfo();
@@ -58,7 +81,7 @@ class _ConfigPageState extends State<ConfigPage> {
     }
   }
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Konfiguracja Part-DB')),
@@ -90,11 +113,57 @@ class _ConfigPageState extends State<ConfigPage> {
             ElevatedButton(
               onPressed: _loading ? null : _save,
               child: _loading
-                  ? const CircularProgressIndicator()
+                  ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
                   : const Text('Zapisz i sprawdź token'),
             ),
             const SizedBox(height: 12),
             Text(_status),
+            const Spacer(),
+            const SizedBox(height: 16),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Zoom level',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(
+                  width: 110,
+                  child: DropdownButton<double>(
+                    isExpanded: true,
+                    value: _selectedZoom,
+                    items: _zoomLevels.map((z) {
+                      return DropdownMenuItem<double>(
+                        value: z,
+                        child: Text('x${z.toString().replaceAll('.', ',')}'),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedZoom = value;
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            // 🔹 Dyskretna wersja aplikacji
+            if (_appVersion.isNotEmpty)
+              Text(
+                'Wersja aplikacji v$_appVersion',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
           ],
         ),
       ),

@@ -5,9 +5,11 @@ import '../models/part.dart';
 
 bool kDebugMode = false;
 
+
 class ApiService {
   String baseUrl = '';
   String token = '';
+  double zoomLevel = 2.0; // domyślnie x2
   final _secureStorage = const FlutterSecureStorage();
 
   ApiService();
@@ -15,8 +17,11 @@ class ApiService {
   Future<void> loadConfig() async {
     final url = await _secureStorage.read(key: 'partdb_base_url');
     final t = await _secureStorage.read(key: 'partdb_token');
+    final zoom = await _secureStorage.read(key: 'camera_zoom');
+
     baseUrl = url ?? '';
     token = t ?? '';
+    zoomLevel = double.tryParse(zoom ?? '2.0') ?? 2.0;
   }
 
   Future<void> saveConfig(String url, String t) async {
@@ -24,6 +29,11 @@ class ApiService {
     await _secureStorage.write(key: 'partdb_token', value: t);
     baseUrl = url;
     token = t;
+  }
+
+  Future<void> saveZoomLevel(double zoom) async {
+    await _secureStorage.write(key: 'camera_zoom', value: zoom.toString());
+    zoomLevel = zoom;
   }
 
   Future<void> clearToken() async {

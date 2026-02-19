@@ -19,7 +19,6 @@ class _ScannerPageState extends State<ScannerPage> {
   bool _processing = false;
   final bool _captureRequested = false;
   String _status = 'Gotowy do skanowania';
-  final double _zoom = 2.0; // 🔍 domyślny zoom x2
 
   @override
   void initState() {
@@ -42,14 +41,20 @@ class _ScannerPageState extends State<ScannerPage> {
 
     await controller.initialize();
 
-    // 🔍 ustawienie zoom x2 (jeśli wspierany)
+    await widget.apiService.loadConfig();
+    final configuredZoom = widget.apiService.zoomLevel;
+
     final maxZoom = await controller.getMaxZoomLevel();
-    final desiredZoom = (_zoom <= maxZoom) ? _zoom : maxZoom;
+    final minZoom = await controller.getMinZoomLevel();
+
+    final desiredZoom = configuredZoom.clamp(minZoom, maxZoom);
+
     await controller.setZoomLevel(desiredZoom);
+
 
     setState(() {
       _cameraController = controller;
-      _status = 'Gotowy do skanowania (zoom x2)';
+      _status = 'Gotowy do skanowania (zoom x${desiredZoom.toStringAsFixed(2)})';
     });
   }
 
