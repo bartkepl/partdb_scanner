@@ -61,6 +61,8 @@ class _ConfigPageState extends State<ConfigPage> {
     await widget.apiService
         .saveConfig(_urlController.text.trim(), tokenToSave);
 
+    await widget.apiService.saveZoomLevel(_selectedZoom);
+
 
     try {
       final info = await widget.apiService.getCurrentTokenInfo();
@@ -118,6 +120,11 @@ class _ConfigPageState extends State<ConfigPage> {
               )
                   : const Text('Zapisz i sprawdź token'),
             ),
+            const SizedBox(height: 12),
+            Text(_status),
+            const Spacer(),
+            const SizedBox(height: 16),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -140,7 +147,6 @@ class _ConfigPageState extends State<ConfigPage> {
                       if (value != null) {
                         setState(() {
                           _selectedZoom = value;
-                          widget.apiService.saveZoomLevel(_selectedZoom);
                         });
                       }
                     },
@@ -148,10 +154,6 @@ class _ConfigPageState extends State<ConfigPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(_status),
-            const Spacer(),
-            const SizedBox(height: 16),
 
             // 🔹 Dyskretna wersja aplikacji
             if (_appVersion.isNotEmpty)
