@@ -58,6 +58,52 @@ class _ScannerPageState extends State<ScannerPage> {
     });
   }
 
+  bool _isValidIpn(String value) {
+    final regex = RegExp(r'^\d{7}$');
+    return regex.hasMatch(value);
+  }
+
+  Future<void> _showTokenDialog(String scannedValue) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("To nie jest IPN"),
+        content: Text(
+            "Zeskanowana wartość:\n\n$scannedValue\n\n"
+                "Nie wygląda na numer IPN (7 cyfr).\n"
+                "Czy zapisać jako API Token?"
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Nie"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Tak"),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await widget.apiService.saveConfig(
+        widget.apiService.baseUrl,
+        scannedValue,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("✅ Token API zapisany")),
+      );
+
+      setState(() {
+        _status = "Token API zapisany";
+      });
+    }
+  }
+
   Future<void> _captureAndScan() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       setState(() => _status = 'Kamera nie gotowa');
@@ -85,20 +131,32 @@ class _ScannerPageState extends State<ScannerPage> {
         return;
       }
 
-      final ipn = barcodes.first.rawValue?.trim() ?? '';
-      if (ipn.isEmpty) {
+      final scannedValue = barcodes.first.rawValue?.trim() ?? '';
+
+      if (scannedValue.isEmpty) {
         setState(() {
-          _status = 'Kod nie zawiera IPN';
+          _status = 'Kod nie zawiera danych';
           _processing = false;
         });
         return;
       }
 
-      print('📦 Zeskanowano IPN: $ipn');
+// 🔎 Sprawdzenie czy to 7 cyfr (IPN)
+      if (!_isValidIpn(scannedValue)) {
+        setState(() {
+          _processing = false;
+          _status = 'To nie jest poprawny IPN';
+        });
+
+        await _showTokenDialog(scannedValue);
+        return;
+      }
+
+      print('📦 Zeskanowano IPN: $scannedValue');
       setState(() => _status = 'Pobieram dane z serwera...');
 
       await widget.apiService.loadConfig();
-      final part = await widget.apiService.findPartByIPN(ipn);
+      final part = await widget.apiService.findPartByIPN(scannedValue);
 
       if (!mounted) return;
 
