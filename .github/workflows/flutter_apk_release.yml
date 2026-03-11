@@ -54,13 +54,13 @@ jobs:
           echo "newTag=$newTag" >> $GITHUB_OUTPUT
 
       # 🔥 Nadpisanie pubspec.yaml tylko w runnerze
-      - name: Update pubspec version (temporary)
-        run: |
-          version=${{ steps.version.outputs.newTag }}
-          cleanVersion=${version#v}
+      #- name: Update pubspec version (temporary)
+        #run: |
+          #version=${{ steps.version.outputs.newTag }}
+          #cleanVersion=${version#v}
 
-          echo "Setting version to $cleanVersion+1"
-          sed -i "s/^version:.*/version: $cleanVersion+1/" pubspec.yaml
+          #echo "Setting version to $cleanVersion+1"
+          #sed -i "s/^version:.*/version: $cleanVersion+1/" pubspec.yaml
 
       # 🔥 Build z nową wersją
       - name: Build APK
