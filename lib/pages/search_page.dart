@@ -3,7 +3,7 @@ import '../models/part.dart';
 import '../services/api_service.dart';
 import 'part_detail_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'barcode_scan_page.dart';
 
 class SearchPage extends StatefulWidget {
   final ApiService apiService;
@@ -14,13 +14,16 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+
   final TextEditingController _searchController = TextEditingController();
+
   List<Part> _results = [];
   bool _loading = false;
   String _message = '';
-  String _searchType = 'auto'; // name/ipn/param/value
+  String _searchType = 'auto';
 
   Future<void> _search() async {
+
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
 
@@ -31,20 +34,34 @@ class _SearchPageState extends State<SearchPage> {
     });
 
     try {
+
       List<Part> found = [];
 
       if (_searchType == 'ipn') {
         found.add(await widget.apiService.findPartByIPN(query));
-      } else if (_searchType == 'name') {
-        found = await widget.apiService.searchPartsAdvanced(query,
-            searchInParams: false, searchInValues: false);
-      } else if (_searchType == 'param') {
-        found = await widget.apiService.searchPartsAdvanced(query,
-            searchInParams: true, searchInValues: false);
-      } else if (_searchType == 'value') {
-        found = await widget.apiService.searchPartsAdvanced(query,
-            searchInParams: false, searchInValues: true);
-      } else {
+      }
+      else if (_searchType == 'name') {
+        found = await widget.apiService.searchPartsAdvanced(
+          query,
+          searchInParams: false,
+          searchInValues: false,
+        );
+      }
+      else if (_searchType == 'param') {
+        found = await widget.apiService.searchPartsAdvanced(
+          query,
+          searchInParams: true,
+          searchInValues: false,
+        );
+      }
+      else if (_searchType == 'value') {
+        found = await widget.apiService.searchPartsAdvanced(
+          query,
+          searchInParams: false,
+          searchInValues: true,
+        );
+      }
+      else {
         found = await widget.apiService.searchPartsAdvanced(query);
       }
 
@@ -54,33 +71,59 @@ class _SearchPageState extends State<SearchPage> {
             ? 'Brak wyników dla "$query"'
             : 'Znaleziono: ${found.length}';
       });
+
     } catch (e) {
+
       setState(() {
         _message = '❌ Błąd: $e';
       });
+
     } finally {
       setState(() => _loading = false);
     }
   }
 
+  Future<void> _scanBarcode() async {
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BarcodeScanPage(apiService: widget.apiService)
+      ),
+    );
+
+    if (result != null) {
+
+      setState(() {
+        _searchController.text = result;
+      });
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       appBar: AppBar(
         title: const Text('Wyszukaj część'),
         actions: [
+
           PopupMenuButton<String>(
             initialValue: _searchType,
             onSelected: (v) => setState(() => _searchType = v),
             itemBuilder: (ctx) => const [
+
               PopupMenuItem(value: 'auto', child: Text('Auto')),
               PopupMenuItem(value: 'ipn', child: Text('Tylko IPN')),
               PopupMenuItem(value: 'name', child: Text('Tylko nazwa')),
               PopupMenuItem(value: 'param', child: Text('Po parametrach')),
               PopupMenuItem(value: 'value', child: Text('Po wartościach')),
+
             ],
           ),
+
         ],
       ),
       body: Padding(
@@ -89,14 +132,40 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             TextField(
               controller: _searchController,
-              decoration: InputDecoration(
+
+              decoration: const InputDecoration(
                 labelText: 'Wpisz fragment IPN, nazwy, parametru...',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: _search,
-                ),
               ),
+
               onSubmitted: (_) => _search(),
+            ),
+
+            const SizedBox(height: 10),
+
+            /// PRZYCISKI
+            Row(
+
+              children: [
+
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.search),
+                    label: const Text("Szukaj"),
+                    onPressed: _search,
+                  ),
+                ),
+
+                const SizedBox(width: 10),
+
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: const Text("Skanuj"),
+                    onPressed: _scanBarcode,
+                  ),
+                ),
+
+              ],
             ),
             const SizedBox(height: 12),
             if (_loading) const LinearProgressIndicator(),
@@ -119,7 +188,9 @@ class _SearchPageState extends State<SearchPage> {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () async {
                       final prefs = await SharedPreferences.getInstance();
-                      final visibleParams = prefs.getStringList('visible_params') ?? [];
+
+                      final visibleParams =
+                          prefs.getStringList('visible_params') ?? [];
 
                       Navigator.push(
                         context,

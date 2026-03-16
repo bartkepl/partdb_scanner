@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'services/api_service.dart';
-import 'pages/scanner_page.dart';
 import 'pages/config_page.dart';
 import 'pages/search_page.dart';
 
@@ -38,16 +37,6 @@ class MyApp extends StatelessWidget {
             foregroundColor: Colors.white,
             elevation: 1,
           ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.black,
-              textStyle: const TextStyle(fontWeight: FontWeight.bold),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
         ),
         home: HomePage(apiService: apiService),
       ),
@@ -70,7 +59,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _tabs.add(ScannerPage(apiService: widget.apiService));
     _tabs.add(SearchPage(apiService: widget.apiService));
     _tabs.add(ConfigPage(apiService: widget.apiService));
   }
@@ -86,8 +74,6 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.white70,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.qr_code_scanner), label: 'Skaner'),
-          BottomNavigationBarItem(
               icon: Icon(Icons.search), label: 'Wyszukaj'),
           BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: 'Konfiguracja'),
@@ -97,4 +83,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

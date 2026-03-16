@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
+import '../services/printer_service.dart';
 
 class PartDetailPage extends StatefulWidget {
   final Part part;
@@ -183,9 +184,38 @@ class _PartDetailPageState extends State<PartDetailPage> {
       appBar: AppBar(
         title: Text(part.name),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshing ? null : _refreshData,
+          MenuAnchor(
+            builder: (BuildContext context, MenuController controller, Widget? child) {
+              return IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+              );
+            },
+            menuChildren: [
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.refresh),
+                onPressed: _refreshing ? null : _refreshData,
+                child: const Text('Odśwież'),
+              ),
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.print),
+                onPressed: () async {
+                  try {
+                    await PrinterService.printPart(_part);
+                    _showToast('Wydrukowano');
+                  } catch (e) {
+                    _showToast('Błąd drukowania: $e', isError: true);
+                  }
+                },
+                child: const Text('Drukuj'),
+              ),
+            ],
           ),
         ],
       ),
