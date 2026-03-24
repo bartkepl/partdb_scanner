@@ -1,0 +1,3 @@
+    const primary = Color(0xFFFBB874);
+    const onPrimary = Color(0x292622FF);
+    const surface = Color(0xFF211A14);

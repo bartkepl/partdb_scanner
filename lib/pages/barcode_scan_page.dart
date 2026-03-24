@@ -18,12 +18,25 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
   CameraController? _cameraController;
   late BarcodeScanner _scanner;
   bool _processing = false;
+  bool _torchOn = false;
 
   @override
   void initState() {
     super.initState();
     _initCamera();
     _scanner = BarcodeScanner();
+  }
+
+  Future<void> _toggleTorch() async {
+    if (_cameraController == null) return;
+
+    _torchOn = !_torchOn;
+
+    await _cameraController!.setFlashMode(
+      _torchOn ? FlashMode.torch : FlashMode.off,
+    );
+
+    setState(() {});
   }
 
   Future<void> _initCamera() async {
@@ -175,10 +188,39 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
             bottom: 20,
             left: 20,
             right: 20,
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.camera),
-              label: const Text("Skanuj"),
-              onPressed: _scan,
+            child: Row(
+              children: [
+
+                /// 🔦 LATARKA (mały okrągły)
+                SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _toggleTorch,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      shape: const CircleBorder(),
+                    ),
+                    child: Icon(
+                      _torchOn ? Icons.flash_on : Icons.flash_off,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                /// 📷 SKANUJ (duży)
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.camera),
+                    label: const Text("Skanuj"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    onPressed: _scan,
+                  ),
+                ),
+              ],
             ),
           )
         ],

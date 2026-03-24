@@ -223,8 +223,9 @@ class _PartDetailPageState extends State<PartDetailPage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
+            Text('ID: ${part.id}'),
             Text('IPN: ${part.partNumber}'),
-            Text('Jednostka: ${part.unit}'),
+            // Text('Jednostka: ${part.unit}'),
             const Divider(),
 
             ...part.partLots.map((lot) {

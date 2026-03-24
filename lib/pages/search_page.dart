@@ -92,12 +92,13 @@ class _SearchPageState extends State<SearchPage> {
       ),
     );
 
-    if (result != null) {
+    if (result != null && result is String && result.isNotEmpty) {
 
       setState(() {
         _searchController.text = result;
       });
 
+      _search(); // 🔥 automatyczne wyszukiwanie
     }
   }
 
