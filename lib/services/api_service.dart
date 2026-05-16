@@ -148,6 +148,36 @@ class ApiService extends ChangeNotifier {
         .toList();
   }
 
+  /// Szuka części po nazwie po stronie serwera (bez pobierania całej listy).
+  /// Dla trybów param/value nadal używa [searchPartsAdvanced].
+  Future<List<Part>> searchByName(String query) async {
+    final encoded = Uri.encodeQueryComponent(query);
+    final List allMembers = [];
+    String? nextUrl = _join('/api/parts?name=$encoded&itemsPerPage=100');
+
+    while (nextUrl != null && allMembers.length < 200) {
+      final r = await _get(Uri.parse(nextUrl));
+      if (r.statusCode != 200) {
+        throw ApiException(r.statusCode, 'Błąd wyszukiwania (${r.statusCode})');
+      }
+      final decoded = json.decode(r.body);
+      if (decoded is Map && decoded.containsKey('hydra:member')) {
+        allMembers.addAll(decoded['hydra:member'] as List);
+        final next = decoded['hydra:view']?['hydra:next'] as String?;
+        nextUrl = next != null ? _join(next) : null;
+      } else if (decoded is List) {
+        allMembers.addAll(decoded);
+        nextUrl = null;
+      } else {
+        nextUrl = null;
+      }
+    }
+
+    return allMembers
+        .map((m) => Part.fromJson(Map<String, dynamic>.from(m as Map)))
+        .toList();
+  }
+
   Future<List<Part>> searchPartsAdvanced(String query,
       {bool searchInParams = true, bool searchInValues = true}) async {
     final lowerQuery = query.toLowerCase();
@@ -174,10 +204,13 @@ class ApiService extends ChangeNotifier {
     return results;
   }
 
-  Future<PartLot> patchPartLot(int lotId, double newAmount) async {
+  Future<PartLot> patchPartLot(int lotId, double newAmount, {String? comment}) async {
+    final body = <String, dynamic>{'amount': newAmount};
+    if (comment != null && comment.isNotEmpty) body['description'] = comment;
+
     final r = await _patch(
       Uri.parse(_join('/api/part_lots/$lotId')),
-      json.encode({'amount': newAmount}),
+      json.encode(body),
     );
 
     if (r.statusCode == 200) {
@@ -209,7 +242,7 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<List<PartParameter>> fetchPartParameters(int partId) async {
+  Future<PartDetails> fetchPartParameters(int partId) async {
     final r = await _get(Uri.parse(_join('/api/parts/$partId')));
 
     if (r.statusCode == 200) {
@@ -232,9 +265,236 @@ class ApiService extends ChangeNotifier {
         }
       }
 
-      return params;
+      // Wyciągnij kategorię i producenta z pełnej odpowiedzi
+      String category = '';
+      final cat = decoded['category'];
+      if (cat is Map) {
+        category = cat['name']?.toString() ?? '';
+      } else if (cat is String && !cat.startsWith('/api/') && !cat.startsWith('http')) {
+        category = cat;
+      }
+
+      String manufacturer = '';
+      final mfr = decoded['manufacturer'];
+      if (mfr is Map) {
+        manufacturer = mfr['name']?.toString() ?? '';
+      } else if (decoded['manufacturers'] is List) {
+        final list = decoded['manufacturers'] as List;
+        if (list.isNotEmpty && list.first is Map) {
+          final m = list.first as Map;
+          final inner = m['manufacturer'];
+          if (inner is Map) manufacturer = inner['name']?.toString() ?? '';
+        }
+      }
+
+      return PartDetails(params: params, category: category, manufacturer: manufacturer);
     } else {
       throw ApiException(r.statusCode, 'Błąd pobierania parametrów (${r.statusCode})');
     }
+  }
+
+  Future<List<PartCategory>> fetchCategories() async {
+    final List allMembers = [];
+    String? nextUrl = _join('/api/categories?itemsPerPage=200');
+
+    while (nextUrl != null) {
+      final r = await _get(Uri.parse(nextUrl));
+      if (r.statusCode != 200) {
+        throw ApiException(r.statusCode, 'Błąd pobierania kategorii (${r.statusCode})');
+      }
+      final decoded = json.decode(r.body);
+      if (decoded is Map && decoded.containsKey('hydra:member')) {
+        allMembers.addAll(decoded['hydra:member'] as List);
+        final next = decoded['hydra:view']?['hydra:next'] as String?;
+        nextUrl = next != null ? _join(next) : null;
+      } else if (decoded is List) {
+        allMembers.addAll(decoded);
+        nextUrl = null;
+      } else {
+        nextUrl = null;
+      }
+    }
+
+    return allMembers
+        .map((m) => PartCategory.fromJson(Map<String, dynamic>.from(m as Map)))
+        .toList();
+  }
+
+  /// Cached IRI pierwszego dostępnego typu załącznika.
+  String? _defaultAttachmentTypeIri;
+
+  Future<String?> _getDefaultAttachmentTypeIri() async {
+    if (_defaultAttachmentTypeIri != null) return _defaultAttachmentTypeIri;
+    try {
+      final r = await _get(Uri.parse(_join('/api/attachment_types?itemsPerPage=1')));
+      if (r.statusCode == 200) {
+        final decoded = json.decode(r.body);
+        final members = decoded is Map
+            ? (decoded['hydra:member'] ?? decoded['member'] ?? [])
+            : decoded;
+        if (members is List && members.isNotEmpty) {
+          final iri = members.first['@id']?.toString() ??
+              '/api/attachment_types/${members.first['id']}';
+          _defaultAttachmentTypeIri = iri;
+          return iri;
+        }
+      }
+    } catch (_) {
+      // typy opcjonalne — kontynuuj bez nich
+    }
+    return null;
+  }
+
+  Future<void> uploadAttachment(int partId, Uint8List imageBytes, String filename) async {
+    final base64data = base64Encode(imageBytes);
+    final mimeType = filename.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+    final dataUrl = 'data:$mimeType;base64,$base64data';
+    final attachmentTypeIri = await _getDefaultAttachmentTypeIri();
+
+    final bodyMap = <String, dynamic>{
+      'name': filename,
+      'element': '/api/parts/$partId',
+      'uploadFile': dataUrl,
+    };
+    if (attachmentTypeIri != null) bodyMap['attachment_type'] = attachmentTypeIri;
+    final body = json.encode(bodyMap);
+
+    final r = await http.post(
+      Uri.parse(_join('/api/attachments')),
+      headers: {..._headers(), 'Content-Type': 'application/json'},
+      body: body,
+    ).timeout(
+      const Duration(seconds: 30),
+      onTimeout: () => throw TimeoutException('Timeout przy wysyłaniu zdjęcia'),
+    );
+
+    if (r.statusCode != 201 && r.statusCode != 200) {
+      throw ApiException(r.statusCode, 'Błąd wysyłania załącznika (${r.statusCode})');
+    }
+  }
+
+  Future<Part> createPart({
+    required String name,
+    String? ipn,
+    String? description,
+    String? categoryIri,
+  }) async {
+    final body = <String, dynamic>{'name': name};
+    if (ipn != null && ipn.isNotEmpty) body['ipn'] = ipn;
+    if (description != null && description.isNotEmpty) body['description'] = description;
+    if (categoryIri != null && categoryIri.isNotEmpty) body['category'] = categoryIri;
+
+    final r = await http.post(
+      Uri.parse(_join('/api/parts')),
+      headers: {..._headers(), 'Content-Type': 'application/json'},
+      body: json.encode(body),
+    ).timeout(
+      _timeout,
+      onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
+    );
+
+    if (r.statusCode == 201 || r.statusCode == 200) {
+      return Part.fromJson(Map<String, dynamic>.from(json.decode(r.body)));
+    } else {
+      throw ApiException(r.statusCode, 'Błąd tworzenia części (${r.statusCode})');
+    }
+  }
+
+  Future<List<StorageLocation>> fetchStorageLocations() async {
+    final List allMembers = [];
+    String? nextUrl = _join('/api/storage_locations?itemsPerPage=200');
+
+    while (nextUrl != null) {
+      final r = await _get(Uri.parse(nextUrl));
+      if (r.statusCode != 200) {
+        throw ApiException(r.statusCode, 'Błąd pobierania lokalizacji (${r.statusCode})');
+      }
+      final decoded = json.decode(r.body);
+      if (decoded is Map && decoded.containsKey('hydra:member')) {
+        allMembers.addAll(decoded['hydra:member'] as List);
+        final next = decoded['hydra:view']?['hydra:next'] as String?;
+        nextUrl = next != null ? _join(next) : null;
+      } else if (decoded is List) {
+        allMembers.addAll(decoded);
+        nextUrl = null;
+      } else {
+        nextUrl = null;
+      }
+    }
+
+    return allMembers
+        .map((m) => StorageLocation.fromJson(Map<String, dynamic>.from(m as Map)))
+        .toList();
+  }
+
+  Future<void> createPartLot({
+    required int partId,
+    required String storageLocationIri,
+    required double amount,
+  }) async {
+    final body = json.encode({
+      'part': '/api/parts/$partId',
+      'storage_location': storageLocationIri,
+      'amount': amount,
+    });
+
+    final r = await http.post(
+      Uri.parse(_join('/api/part_lots')),
+      headers: {..._headers(), 'Content-Type': 'application/json'},
+      body: body,
+    ).timeout(
+      _timeout,
+      onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
+    );
+
+    if (r.statusCode != 201 && r.statusCode != 200) {
+      throw ApiException(r.statusCode, 'Błąd tworzenia lotu (${r.statusCode})');
+    }
+  }
+}
+
+class PartDetails {
+  final List<PartParameter> params;
+  final String category;
+  final String manufacturer;
+
+  const PartDetails({
+    required this.params,
+    this.category = '',
+    this.manufacturer = '',
+  });
+}
+
+class PartCategory {
+  final int id;
+  final String name;
+  final String iri;
+
+  const PartCategory({required this.id, required this.name, required this.iri});
+
+  factory PartCategory.fromJson(Map<String, dynamic> json) {
+    final id = (json['id'] is int) ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0;
+    return PartCategory(
+      id: id,
+      name: json['name']?.toString() ?? '',
+      iri: json['@id']?.toString() ?? '/api/categories/$id',
+    );
+  }
+}
+
+class StorageLocation {
+  final int id;
+  final String name;
+  final String iri;
+
+  const StorageLocation({required this.id, required this.name, required this.iri});
+
+  factory StorageLocation.fromJson(Map<String, dynamic> json) {
+    final id = (json['id'] is int) ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0;
+    return StorageLocation(
+      id: id,
+      name: json['name']?.toString() ?? '',
+      iri: json['@id']?.toString() ?? '/api/storage_locations/$id',
+    );
   }
 }

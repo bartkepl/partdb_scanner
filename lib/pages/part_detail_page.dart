@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
 import '../services/history_service.dart';
@@ -19,6 +20,7 @@ class _PartDetailPageState extends State<PartDetailPage> {
   bool _refreshing = false;
   late Part _part;
   final Map<int, TextEditingController> _controllers = {};
+  final Map<int, TextEditingController> _commentControllers = {};
   final Map<int, TextEditingController> _paramControllers = {};
 
   @override
@@ -36,14 +38,16 @@ class _PartDetailPageState extends State<PartDetailPage> {
 
   void _initControllers() {
     final newIds = _part.partLots.map((l) => l.id).toSet();
-    _controllers.keys.where((id) => !newIds.contains(id)).toList().forEach((id) {
+    for (final id in _controllers.keys.where((id) => !newIds.contains(id)).toList()) {
       _controllers.remove(id)!.dispose();
-    });
+      _commentControllers.remove(id)?.dispose();
+    }
     for (final lot in _part.partLots) {
       _controllers.putIfAbsent(
         lot.id,
         () => TextEditingController(text: lot.amount.toInt().toString()),
       );
+      _commentControllers.putIfAbsent(lot.id, () => TextEditingController());
     }
   }
 
@@ -62,12 +66,9 @@ class _PartDetailPageState extends State<PartDetailPage> {
 
   @override
   void dispose() {
-    for (final c in _controllers.values) {
-      c.dispose();
-    }
-    for (final c in _paramControllers.values) {
-      c.dispose();
-    }
+    for (final c in _controllers.values) { c.dispose(); }
+    for (final c in _commentControllers.values) { c.dispose(); }
+    for (final c in _paramControllers.values) { c.dispose(); }
     super.dispose();
   }
 
@@ -79,6 +80,48 @@ class _PartDetailPageState extends State<PartDetailPage> {
         backgroundColor: isError ? Colors.red : Colors.green,
       ),
     );
+  }
+
+  Future<void> _addPhoto() async {
+    final picker = ImagePicker();
+    final source = await showDialog<ImageSource>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Dodaj zdjęcie'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, ImageSource.camera),
+            child: const Text('Aparat'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
+            child: const Text('Galeria'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Anuluj'),
+          ),
+        ],
+      ),
+    );
+    if (source == null) return;
+
+    final xfile = await picker.pickImage(source: source, imageQuality: 75, maxWidth: 1920);
+    if (xfile == null) return;
+
+    setState(() => _saving = true);
+    try {
+      final bytes = await xfile.readAsBytes();
+      final filename = '${_part.name.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      await widget.apiService.uploadAttachment(_part.id, bytes, filename);
+      if (!mounted) return;
+      _showToast('Zdjęcie dodane do PartDB');
+    } catch (e) {
+      if (!mounted) return;
+      _showToast('Błąd wysyłania: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   Future<void> _refreshData() async {
@@ -103,12 +146,14 @@ class _PartDetailPageState extends State<PartDetailPage> {
 
   Future<void> _loadParameters() async {
     try {
-      final params = await widget.apiService.fetchPartParameters(_part.id);
+      final details = await widget.apiService.fetchPartParameters(_part.id);
       setState(() {
         _part.parameters
           ..clear()
-          ..addAll(params);
-        _initParamControllers(params);
+          ..addAll(details.params);
+        _initParamControllers(details.params);
+        if (details.category.isNotEmpty) _part.category = details.category;
+        if (details.manufacturer.isNotEmpty) _part.manufacturer = details.manufacturer;
       });
     } catch (e) {
       _showToast('Nie udało się pobrać parametrów', isError: true);
@@ -120,21 +165,25 @@ class _PartDetailPageState extends State<PartDetailPage> {
 
     try {
       final controller = _controllers[lot.id];
+      final commentCtrl = _commentControllers[lot.id];
       final enteredValue =
-          int.tryParse(controller?.text.trim() ?? '') ??
-              lot.amount.toInt();
+          int.tryParse(controller?.text.trim() ?? '') ?? lot.amount.toInt();
       lot.amount = enteredValue.toDouble();
 
-      final updated =
-      await widget.apiService.patchPartLot(lot.id, lot.amount);
+      final comment = commentCtrl?.text.trim();
+      final updated = await widget.apiService.patchPartLot(
+        lot.id,
+        lot.amount,
+        comment: (comment != null && comment.isNotEmpty) ? comment : null,
+      );
 
       setState(() {
         lot.amount = updated.amount;
         controller?.text = lot.amount.toInt().toString();
+        commentCtrl?.clear();
       });
 
-      _showToast(
-          'Zapisano: ${lot.locationName} = ${lot.amount.toInt()}');
+      _showToast('Zapisano: ${lot.locationName} = ${lot.amount.toInt()}');
     } catch (e) {
       _showToast('Błąd: $e', isError: true);
     } finally {
@@ -254,6 +303,11 @@ class _PartDetailPageState extends State<PartDetailPage> {
                 ),
                 child: const Text('Etykiety Niimbot'),
               ),
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.add_a_photo),
+                onPressed: _saving ? null : _addPhoto,
+                child: const Text('Dodaj zdjęcie'),
+              ),
             ],
           ),
         ],
@@ -263,12 +317,31 @@ class _PartDetailPageState extends State<PartDetailPage> {
         child: ListView(
           children: [
             Text('ID: ${part.id}'),
-            Text('IPN: ${part.partNumber}'),
-            // Text('Jednostka: ${part.unit}'),
+            if (part.partNumber.isNotEmpty) Text('IPN: ${part.partNumber}'),
+            if (part.category.isNotEmpty)
+              Text('Kategoria: ${part.category}',
+                  style: const TextStyle(color: Colors.grey)),
+            if (part.manufacturer.isNotEmpty)
+              Text('Producent: ${part.manufacturer}',
+                  style: const TextStyle(color: Colors.grey)),
+            if (part.tags.isNotEmpty)
+              Text('Tagi: ${part.tags}',
+                  style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            if (part.description.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(part.description,
+                  style: const TextStyle(fontStyle: FontStyle.italic)),
+            ],
+            if (part.comment.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text('Notatka: ${part.comment}',
+                  style: const TextStyle(color: Colors.amber, fontSize: 12)),
+            ],
             const Divider(),
 
             ...part.partLots.map((lot) {
               final controller = _controllers[lot.id]!;
+              final commentCtrl = _commentControllers[lot.id]!;
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -279,29 +352,33 @@ class _PartDetailPageState extends State<PartDetailPage> {
                       Row(
                         children: [
                           IconButton(
-                            icon:
-                            const Icon(Icons.remove_circle_outline),
-                            onPressed: () =>
-                                setState(() => _increment(lot, -1)),
+                            icon: const Icon(Icons.remove_circle_outline),
+                            onPressed: () => setState(() => _increment(lot, -1)),
                           ),
                           Expanded(
                             child: TextField(
                               controller: controller,
                               textAlign: TextAlign.center,
-                              keyboardType:
-                              TextInputType.number,
+                              keyboardType: TextInputType.number,
                             ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.add_circle_outline),
-                            onPressed: () =>
-                                setState(() => _increment(lot, 1)),
+                            onPressed: () => setState(() => _increment(lot, 1)),
                           ),
                         ],
                       ),
+                      TextField(
+                        controller: commentCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Komentarz (opcjonalnie)',
+                          hintText: 'np. Dostawa TME, zużycie...',
+                          isDense: true,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       ElevatedButton(
-                        onPressed:
-                        _saving ? null : () => _saveLot(lot),
+                        onPressed: _saving ? null : () => _saveLot(lot),
                         child: const Text('Zapisz zmiany'),
                       ),
                     ],

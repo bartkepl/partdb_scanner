@@ -80,6 +80,11 @@ class Part {
   final String partNumber;
   final String unit;
   final double minAmount;
+  final String description;
+  final String comment;
+  String category;
+  String manufacturer;
+  final String tags;
   final List<PartLot> partLots;
   final List<PartParameter> parameters;
 
@@ -89,6 +94,11 @@ class Part {
     required this.partNumber,
     required this.unit,
     this.minAmount = 0,
+    this.description = '',
+    this.comment = '',
+    this.category = '',
+    this.manufacturer = '',
+    this.tags = '',
     required this.partLots,
     required this.parameters,
   });
@@ -116,6 +126,33 @@ class Part {
         ? (json['minAmount'] as num).toDouble()
         : double.tryParse(json['minAmount']?.toString() ?? '0') ?? 0.0;
 
+    final description = json['description']?.toString() ?? '';
+    final comment = json['comment']?.toString() ?? '';
+    final tags = json['tags']?.toString() ?? '';
+
+    String category = '';
+    if (json['category'] is Map) {
+      category = json['category']['name']?.toString() ?? '';
+    } else if (json['category'] is String) {
+      final s = json['category'] as String;
+      // Ignoruj IRI stringi — zostaną wypełnione przy pełnym fetch
+      if (!s.startsWith('/api/') && !s.startsWith('http')) category = s;
+    }
+
+    String manufacturer = '';
+    if (json['manufacturer'] is Map) {
+      manufacturer = json['manufacturer']['name']?.toString() ?? '';
+    } else if (json['manufacturer'] is String) {
+      final s = json['manufacturer'] as String;
+      if (!s.startsWith('/api/') && !s.startsWith('http')) manufacturer = s;
+    } else if (json['manufacturers'] is List && (json['manufacturers'] as List).isNotEmpty) {
+      final m = (json['manufacturers'] as List).first;
+      if (m is Map) {
+        final mfr = m['manufacturer'];
+        if (mfr is Map) manufacturer = mfr['name']?.toString() ?? '';
+      }
+    }
+
     final List<PartLot> lots = [];
     if (json['partLots'] is List) {
       for (final lot in json['partLots']) {
@@ -139,6 +176,11 @@ class Part {
       partNumber: partNumber,
       unit: unit,
       minAmount: minAmount,
+      description: description,
+      comment: comment,
+      category: category,
+      manufacturer: manufacturer,
+      tags: tags,
       partLots: lots,
       parameters: params,
     );
