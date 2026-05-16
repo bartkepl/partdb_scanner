@@ -84,6 +84,31 @@ class ApiService extends ChangeNotifier {
         onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
       );
 
+  /// Wyciąga czytelny opis błędu z odpowiedzi PartDB (hydra:description / violations / detail).
+  String _extractError(http.Response r, String fallback) {
+    try {
+      final decoded = json.decode(r.body);
+      if (decoded is Map) {
+        // API Platform validation error
+        final desc = decoded['hydra:description']?.toString();
+        if (desc != null && desc.isNotEmpty) return desc;
+        // violations list
+        final violations = decoded['violations'];
+        if (violations is List && violations.isNotEmpty) {
+          return violations
+              .map((v) => '${v['propertyPath']}: ${v['message']}')
+              .join(', ');
+        }
+        // generic detail
+        final detail = decoded['detail']?.toString();
+        if (detail != null && detail.isNotEmpty) return detail;
+        final title = decoded['title']?.toString();
+        if (title != null && title.isNotEmpty) return title;
+      }
+    } catch (_) {}
+    return '$fallback (${r.statusCode})';
+  }
+
   Future<Map<String, dynamic>> getCurrentTokenInfo() async {
     final r = await _get(Uri.parse(_join('/api/tokens/current')));
     if (r.statusCode == 200) {
@@ -361,7 +386,7 @@ class ApiService extends ChangeNotifier {
 
     final r = await http.post(
       Uri.parse(_join('/api/attachments')),
-      headers: {..._headers(), 'Content-Type': 'application/json'},
+      headers: {..._headers(), 'Content-Type': 'application/ld+json'},
       body: body,
     ).timeout(
       const Duration(seconds: 30),
@@ -369,88 +394,10 @@ class ApiService extends ChangeNotifier {
     );
 
     if (r.statusCode != 201 && r.statusCode != 200) {
-      throw ApiException(r.statusCode, 'Błąd wysyłania załącznika (${r.statusCode})');
+      throw ApiException(r.statusCode, _extractError(r, 'Błąd wysyłania załącznika'));
     }
   }
 
-  Future<Part> createPart({
-    required String name,
-    String? ipn,
-    String? description,
-    String? categoryIri,
-  }) async {
-    final body = <String, dynamic>{'name': name};
-    if (ipn != null && ipn.isNotEmpty) body['ipn'] = ipn;
-    if (description != null && description.isNotEmpty) body['description'] = description;
-    if (categoryIri != null && categoryIri.isNotEmpty) body['category'] = categoryIri;
-
-    final r = await http.post(
-      Uri.parse(_join('/api/parts')),
-      headers: {..._headers(), 'Content-Type': 'application/json'},
-      body: json.encode(body),
-    ).timeout(
-      _timeout,
-      onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
-    );
-
-    if (r.statusCode == 201 || r.statusCode == 200) {
-      return Part.fromJson(Map<String, dynamic>.from(json.decode(r.body)));
-    } else {
-      throw ApiException(r.statusCode, 'Błąd tworzenia części (${r.statusCode})');
-    }
-  }
-
-  Future<List<StorageLocation>> fetchStorageLocations() async {
-    final List allMembers = [];
-    String? nextUrl = _join('/api/storage_locations?itemsPerPage=200');
-
-    while (nextUrl != null) {
-      final r = await _get(Uri.parse(nextUrl));
-      if (r.statusCode != 200) {
-        throw ApiException(r.statusCode, 'Błąd pobierania lokalizacji (${r.statusCode})');
-      }
-      final decoded = json.decode(r.body);
-      if (decoded is Map && decoded.containsKey('hydra:member')) {
-        allMembers.addAll(decoded['hydra:member'] as List);
-        final next = decoded['hydra:view']?['hydra:next'] as String?;
-        nextUrl = next != null ? _join(next) : null;
-      } else if (decoded is List) {
-        allMembers.addAll(decoded);
-        nextUrl = null;
-      } else {
-        nextUrl = null;
-      }
-    }
-
-    return allMembers
-        .map((m) => StorageLocation.fromJson(Map<String, dynamic>.from(m as Map)))
-        .toList();
-  }
-
-  Future<void> createPartLot({
-    required int partId,
-    required String storageLocationIri,
-    required double amount,
-  }) async {
-    final body = json.encode({
-      'part': '/api/parts/$partId',
-      'storage_location': storageLocationIri,
-      'amount': amount,
-    });
-
-    final r = await http.post(
-      Uri.parse(_join('/api/part_lots')),
-      headers: {..._headers(), 'Content-Type': 'application/json'},
-      body: body,
-    ).timeout(
-      _timeout,
-      onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
-    );
-
-    if (r.statusCode != 201 && r.statusCode != 200) {
-      throw ApiException(r.statusCode, 'Błąd tworzenia lotu (${r.statusCode})');
-    }
-  }
 }
 
 class PartDetails {
@@ -469,32 +416,29 @@ class PartCategory {
   final int id;
   final String name;
   final String iri;
+  final String? parentIri;
 
-  const PartCategory({required this.id, required this.name, required this.iri});
+  const PartCategory({
+    required this.id,
+    required this.name,
+    required this.iri,
+    this.parentIri,
+  });
 
   factory PartCategory.fromJson(Map<String, dynamic> json) {
     final id = (json['id'] is int) ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0;
+    final parent = json['parent'];
+    String? parentIri;
+    if (parent is String && parent.startsWith('/api/')) {
+      parentIri = parent;
+    } else if (parent is Map) {
+      parentIri = parent['@id']?.toString();
+    }
     return PartCategory(
       id: id,
       name: json['name']?.toString() ?? '',
       iri: json['@id']?.toString() ?? '/api/categories/$id',
-    );
-  }
-}
-
-class StorageLocation {
-  final int id;
-  final String name;
-  final String iri;
-
-  const StorageLocation({required this.id, required this.name, required this.iri});
-
-  factory StorageLocation.fromJson(Map<String, dynamic> json) {
-    final id = (json['id'] is int) ? json['id'] : int.tryParse(json['id']?.toString() ?? '0') ?? 0;
-    return StorageLocation(
-      id: id,
-      name: json['name']?.toString() ?? '',
-      iri: json['@id']?.toString() ?? '/api/storage_locations/$id',
+      parentIri: parentIri,
     );
   }
 }

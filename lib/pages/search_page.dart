@@ -3,8 +3,6 @@ import '../models/part.dart';
 import '../services/api_service.dart';
 import '../services/history_service.dart';
 import '../services/export_service.dart';
-import '../services/vendor_barcode_parser.dart';
-import 'create_part_page.dart';
 import 'part_detail_page.dart';
 import 'barcode_scan_page.dart';
 import 'stock_taking_page.dart';
@@ -108,16 +106,9 @@ class _SearchPageState extends State<SearchPage> {
 
     if (result == null || result.isEmpty) return;
 
-    // 1. Kod dostawcy (LCSC / TME)
-    final vendor = VendorBarcodeParser.parse(result);
-    if (vendor != null) {
-      await _showVendorDialog(vendor);
-      return;
-    }
-
     setState(() => _searchController.text = result);
 
-    // 2. 7-cyfrowy IPN → szybki bottom sheet
+    // 7-cyfrowy IPN → szybki bottom sheet
     if (RegExp(r'^\d{7}$').hasMatch(result)) {
       setState(() => _loading = true);
       try {
@@ -132,60 +123,6 @@ class _SearchPageState extends State<SearchPage> {
       }
     } else {
       _search();
-    }
-  }
-
-  Future<void> _showVendorDialog(VendorBarcode vendor) async {
-    final action = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Etykieta ${vendor.vendor}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Symbol: ${vendor.partNo}',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            if (vendor.qty > 0) Text('Ilość: ${vendor.qty} szt.'),
-            if (vendor.description.isNotEmpty)
-              Text(vendor.description,
-                  style: const TextStyle(fontSize: 13, color: Colors.grey)),
-            if (vendor.manufacturer.isNotEmpty)
-              Text('Producent: ${vendor.manufacturer}',
-                  style: const TextStyle(fontSize: 13)),
-            if (vendor.package.isNotEmpty)
-              Text('Obudowa: ${vendor.package}',
-                  style: const TextStyle(fontSize: 13)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 'search'),
-            child: const Text('Szukaj w PartDB'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 'create'),
-            child: const Text('Utwórz część'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 'cancel'),
-            child: const Text('Anuluj'),
-          ),
-        ],
-      ),
-    );
-
-    if (!mounted) return;
-    if (action == 'search') {
-      setState(() => _searchController.text = vendor.partNo);
-      _search();
-    } else if (action == 'create') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => CreatePartPage(apiService: widget.apiService, prefill: vendor),
-        ),
-      );
     }
   }
 
@@ -346,16 +283,6 @@ class _SearchPageState extends State<SearchPage> {
     final showHistory = _results.isEmpty && !_loading && _searchController.text.isEmpty;
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Nowa część',
-        child: const Icon(Icons.add),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CreatePartPage(apiService: widget.apiService),
-          ),
-        ),
-      ),
       appBar: AppBar(
         title: const Text('Wyszukaj część'),
         actions: [
