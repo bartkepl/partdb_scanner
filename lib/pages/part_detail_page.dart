@@ -3,6 +3,7 @@ import '../models/part.dart';
 import '../services/api_service.dart';
 import '../services/history_service.dart';
 import '../services/printer_service.dart';
+import 'label_print_page.dart';
 
 class PartDetailPage extends StatefulWidget {
   final Part part;
@@ -241,7 +242,17 @@ class _PartDetailPageState extends State<PartDetailPage> {
                     _showToast('Błąd drukowania: $e', isError: true);
                   }
                 },
-                child: const Text('Drukuj'),
+                child: const Text('Drukuj (Sunmi)'),
+              ),
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.label_outline),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LabelPrintPage(part: _part),
+                  ),
+                ),
+                child: const Text('Etykiety Niimbot'),
               ),
             ],
           ),
