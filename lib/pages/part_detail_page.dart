@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
+import '../services/history_service.dart';
 import '../services/printer_service.dart';
 
 class PartDetailPage extends StatefulWidget {
@@ -17,6 +18,7 @@ class _PartDetailPageState extends State<PartDetailPage> {
   bool _refreshing = false;
   late Part _part;
   final Map<int, TextEditingController> _controllers = {};
+  final Map<int, TextEditingController> _paramControllers = {};
 
   @override
   void initState() {
@@ -24,19 +26,45 @@ class _PartDetailPageState extends State<PartDetailPage> {
     _part = widget.part;
     _initControllers();
     _loadParameters();
+    HistoryService.add(HistoryEntry(
+      id: _part.id,
+      name: _part.name,
+      ipn: _part.partNumber,
+    ));
   }
 
   void _initControllers() {
-    _controllers.clear();
+    final newIds = _part.partLots.map((l) => l.id).toSet();
+    _controllers.keys.where((id) => !newIds.contains(id)).toList().forEach((id) {
+      _controllers.remove(id)!.dispose();
+    });
     for (final lot in _part.partLots) {
-      _controllers[lot.id] =
-          TextEditingController(text: lot.amount.toInt().toString());
+      _controllers.putIfAbsent(
+        lot.id,
+        () => TextEditingController(text: lot.amount.toInt().toString()),
+      );
+    }
+  }
+
+  void _initParamControllers(List<PartParameter> params) {
+    final newIds = params.map((p) => p.id).toSet();
+    _paramControllers.keys.where((id) => !newIds.contains(id)).toList().forEach((id) {
+      _paramControllers.remove(id)!.dispose();
+    });
+    for (final param in params) {
+      _paramControllers.putIfAbsent(
+        param.id,
+        () => TextEditingController(text: param.value),
+      );
     }
   }
 
   @override
   void dispose() {
     for (final c in _controllers.values) {
+      c.dispose();
+    }
+    for (final c in _paramControllers.values) {
       c.dispose();
     }
     super.dispose();
@@ -74,12 +102,12 @@ class _PartDetailPageState extends State<PartDetailPage> {
 
   Future<void> _loadParameters() async {
     try {
-      final params =
-      await widget.apiService.fetchPartParameters(_part.id);
+      final params = await widget.apiService.fetchPartParameters(_part.id);
       setState(() {
         _part.parameters
           ..clear()
           ..addAll(params);
+        _initParamControllers(params);
       });
     } catch (e) {
       _showToast('Nie udało się pobrać parametrów', isError: true);
@@ -278,31 +306,26 @@ class _PartDetailPageState extends State<PartDetailPage> {
                 style: TextStyle(
                     fontSize: 18, fontWeight: FontWeight.bold)),
 
-            ...sortedParams.map((param) => Card(
-              child: ListTile(
-                title: Text(param.name),
-                subtitle: TextField(
-                  controller: TextEditingController(
-                    text: param.value,
+            ...sortedParams.map((param) {
+              final ctrl = _paramControllers[param.id];
+              return Card(
+                child: ListTile(
+                  title: Text(param.name),
+                  subtitle: TextField(
+                    controller: ctrl,
+                    onSubmitted: (v) async {
+                      try {
+                        await widget.apiService.patchPartParameter(param.id, v);
+                        setState(() => param.value = v);
+                        _showToast('Zaktualizowano: ${param.name}');
+                      } catch (e) {
+                        _showToast('Błąd zapisu: $e', isError: true);
+                      }
+                    },
                   ),
-                  onSubmitted: (v) async {
-                    try {
-                      await widget.apiService
-                          .patchPartParameter(param.id, v);
-
-                      setState(() => param.value = v);
-
-                      _showToast(
-                          'Zaktualizowano: ${param.name}');
-                    } catch (e) {
-                      _showToast(
-                          'Błąd zapisu: $e',
-                          isError: true);
-                    }
-                  },
                 ),
-              ),
-            )),
+              );
+            }),
           ],
         ),
       ),

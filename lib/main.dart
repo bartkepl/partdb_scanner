@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'services/api_service.dart';
 import 'pages/config_page.dart';
+import 'pages/ipn_generator_page.dart';
 import 'pages/search_page.dart';
 
 void main() {
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final apiService = ApiService();
 
-    return Provider<ApiService>(
+    return ChangeNotifierProvider<ApiService>(
       create: (_) => apiService,
       child: MaterialApp(
         title: 'Part-DB Scanner',
@@ -60,6 +61,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _tabs.add(SearchPage(apiService: widget.apiService));
+    _tabs.add(IpnGeneratorPage(apiService: widget.apiService));
     _tabs.add(ConfigPage(apiService: widget.apiService));
   }
 
@@ -73,10 +75,9 @@ class _HomePageState extends State<HomePage> {
         selectedItemColor: Colors.orange,
         unselectedItemColor: Colors.white70,
         items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.search), label: 'Wyszukaj'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: 'Konfiguracja'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Wyszukaj'),
+          BottomNavigationBarItem(icon: Icon(Icons.label), label: 'Generator IPN'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Konfiguracja'),
         ],
         onTap: (i) => setState(() => _index = i),
       ),

@@ -79,6 +79,7 @@ class Part {
   final String name;
   final String partNumber;
   final String unit;
+  final double minAmount;
   final List<PartLot> partLots;
   final List<PartParameter> parameters;
 
@@ -87,9 +88,16 @@ class Part {
     required this.name,
     required this.partNumber,
     required this.unit,
+    this.minAmount = 0,
     required this.partLots,
     required this.parameters,
   });
+
+  int get totalStock => partLots.isEmpty
+      ? 0
+      : partLots.map((l) => l.amount.toInt()).reduce((a, b) => a + b);
+
+  bool get isLowStock => minAmount > 0 && totalStock < minAmount;
 
   factory Part.fromJson(Map<String, dynamic> json) {
     final id = (json['id'] is int)
@@ -104,6 +112,10 @@ class Part {
         ? (json['unit']['name']?.toString() ?? '')
         : json['unit']?.toString() ?? '';
 
+    final minAmount = (json['minAmount'] is num)
+        ? (json['minAmount'] as num).toDouble()
+        : double.tryParse(json['minAmount']?.toString() ?? '0') ?? 0.0;
+
     final List<PartLot> lots = [];
     if (json['partLots'] is List) {
       for (final lot in json['partLots']) {
@@ -115,7 +127,6 @@ class Part {
     if (json['parameters'] is List) {
       for (final p in json['parameters']) {
         if (p is Map) {
-          // rzutowanie kluczy na String
           final casted = p.map((key, value) => MapEntry(key.toString(), value));
           params.add(PartParameter.fromJson(casted));
         }
@@ -127,6 +138,7 @@ class Part {
       name: name,
       partNumber: partNumber,
       unit: unit,
+      minAmount: minAmount,
       partLots: lots,
       parameters: params,
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../services/api_service.dart';
+import 'barcode_scan_page.dart';
 
 class ConfigPage extends StatefulWidget {
   final ApiService apiService;
@@ -31,15 +32,10 @@ class _ConfigPageState extends State<ConfigPage> {
   void initState() {
     super.initState();
     _loadAppVersion();
-
-    widget.apiService.loadConfig().then((_) {
-      setState(() {
-        _urlController.text = widget.apiService.baseUrl;
-        _tokenController.text = widget.apiService.token;
-        if (_tokenController.text.isNotEmpty) _tokenHidden = true;
-      });
-      _selectedZoom = widget.apiService.zoomLevel;
-    });
+    _urlController.text = widget.apiService.baseUrl;
+    _tokenController.text = widget.apiService.token;
+    _tokenHidden = widget.apiService.token.isNotEmpty;
+    _selectedZoom = widget.apiService.zoomLevel;
   }
 
   Future<void> _loadAppVersion() async {
@@ -47,6 +43,21 @@ class _ConfigPageState extends State<ConfigPage> {
     setState(() {
       _appVersion = '${info.version}+${info.buildNumber}';
     });
+  }
+
+  Future<void> _scanToken() async {
+    final scanned = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BarcodeScanPage(apiService: widget.apiService),
+      ),
+    );
+    if (scanned != null && scanned.isNotEmpty) {
+      setState(() {
+        _tokenController.text = scanned;
+        _tokenHidden = false;
+      });
+    }
   }
 
   Future<void> _save() async {
@@ -92,19 +103,29 @@ class _ConfigPageState extends State<ConfigPage> {
                 labelText: 'Base URL (np. http://192.168.1.10:8000)',
               ),
             ),
-            TextField(
-              controller: _tokenController,
-              obscureText: _tokenHidden,
-              decoration: InputDecoration(
-                labelText: 'API Token',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                      _tokenHidden ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () => setState(() {
-                    _tokenHidden = !_tokenHidden;
-                  }),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _tokenController,
+                    obscureText: _tokenHidden,
+                    decoration: InputDecoration(
+                      labelText: 'API Token',
+                      suffixIcon: IconButton(
+                        icon: Icon(_tokenHidden ? Icons.visibility : Icons.visibility_off),
+                        onPressed: () => setState(() {
+                          _tokenHidden = !_tokenHidden;
+                        }),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                IconButton(
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'Skanuj token',
+                  onPressed: _scanToken,
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             ElevatedButton(
