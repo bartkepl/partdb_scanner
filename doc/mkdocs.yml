@@ -1,0 +1,78 @@
+site_name: PartDB Scanner
+site_description: Dokumentacja aplikacji mobilnej PartDB Scanner – skaner i menedżer komponentów elektronicznych
+site_author: bartkepl
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: pl
+  palette:
+    - scheme: default
+      primary: deep-orange
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Tryb ciemny
+    - scheme: slate
+      primary: deep-orange
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Tryb jasny
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - attr_list
+  - md_in_html
+  - footnotes
+  - def_list
+  - toc:
+      permalink: true
+
+nav:
+  - Strona główna: index.md
+  - Pierwsze kroki: getting-started.md
+  - Architektura:
+    - Przegląd: architecture/index.md
+  - Ekrany:
+    - Przegląd: pages/index.md
+    - Wyszukiwanie: pages/search.md
+    - Szczegóły części: pages/part-detail.md
+    - Przeglądarka kategorii: pages/category-browser.md
+    - Generator IPN: pages/ipn-generator.md
+    - Inwentaryzacja: pages/stock-taking.md
+    - Drukowanie etykiet: pages/label-print.md
+    - Konfiguracja: pages/config.md
+  - API REST: api.md
+  - Modele danych: models.md
