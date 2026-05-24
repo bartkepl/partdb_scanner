@@ -65,6 +65,46 @@ class NiimbotService {
     _connected = false;
   }
 
+  // ─── Generowanie linii cięcia jako PNG ──────────────────────────────────
+
+  /// Generuje przerywaną linię jako PNG o wymiarach [thickness]×[length] px (pionową).
+  static Future<Uint8List> _generateDashedLine({
+    required int length,
+    int thickness = 2,
+  }) async {
+    final recorder = ui.PictureRecorder();
+    final canvas = ui.Canvas(recorder);
+    final w = thickness.toDouble();
+    final h = length.toDouble();
+
+    canvas.drawRect(
+      ui.Rect.fromLTWH(0, 0, w, h),
+      ui.Paint()..color = const ui.Color(0xFFFFFFFF),
+    );
+
+    final black = ui.Paint()..color = const ui.Color(0xFF000000);
+    const dashLen = 8;
+    const gapLen = 6;
+    int y = 0;
+    bool draw = true;
+    while (y < length) {
+      final end = (y + (draw ? dashLen : gapLen)).clamp(0, length);
+      if (draw) {
+        canvas.drawRect(
+          ui.Rect.fromLTWH(0, y.toDouble(), w, (end - y).toDouble()),
+          black,
+        );
+      }
+      y = end;
+      draw = !draw;
+    }
+
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(thickness, length);
+    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+    return bytes!.buffer.asUint8List();
+  }
+
   // ─── Generowanie DataMatrix jako PNG ────────────────────────────────────
 
   /// Generuje kod DataMatrix jako PNG [Uint8List] o wymiarach [size]×[size] px.
@@ -153,6 +193,32 @@ class NiimbotService {
       height: 72,
       align: HAlignment.center,
       vAlign: VAlignment.bottom,
+      threshold: 128,
+      rotate: 0,
+    ));
+
+    // Linie cięcia 2mm od fizycznej górnej i dolnej krawędzi (wzdłuż 14mm)
+    const cutMarginPx = 14; // 2mm = 16px @ 203 DPI
+    final cutLine = await _generateDashedLine(length: _drawerPH);
+    page.addImageFromBuffer(ImageFromBufferOptions(
+      buffer: cutLine,
+      x: cutMarginPx,
+      y: _drawerPH ~/ 2,
+      width: 2,
+      height: _drawerPH,
+      align: HAlignment.center,
+      vAlign: VAlignment.middle,
+      threshold: 128,
+      rotate: 0,
+    ));
+    page.addImageFromBuffer(ImageFromBufferOptions(
+      buffer: cutLine,
+      x: _drawerFD - cutMarginPx,
+      y: _drawerPH ~/ 2,
+      width: 2,
+      height: _drawerPH,
+      align: HAlignment.center,
+      vAlign: VAlignment.middle,
       threshold: 128,
       rotate: 0,
     ));
