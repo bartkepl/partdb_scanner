@@ -83,6 +83,7 @@ class Part {
   final String description;
   final String comment;
   String category;
+  int categoryId;
   String manufacturer;
   final String tags;
   final List<PartLot> partLots;
@@ -97,6 +98,7 @@ class Part {
     this.description = '',
     this.comment = '',
     this.category = '',
+    this.categoryId = 0,
     this.manufacturer = '',
     this.tags = '',
     required this.partLots,
@@ -131,12 +133,20 @@ class Part {
     final tags = json['tags']?.toString() ?? '';
 
     String category = '';
+    int categoryId = 0;
     if (json['category'] is Map) {
       category = json['category']['name']?.toString() ?? '';
+      final rawId = json['category']['id'];
+      categoryId = rawId is int ? rawId : int.tryParse(rawId?.toString() ?? '0') ?? 0;
     } else if (json['category'] is String) {
       final s = json['category'] as String;
-      // Ignoruj IRI stringi — zostaną wypełnione przy pełnym fetch
-      if (!s.startsWith('/api/') && !s.startsWith('http')) category = s;
+      // IRI string like /api/categories/42 — extract id from end
+      final match = RegExp(r'/(\d+)$').firstMatch(s);
+      if (match != null) {
+        categoryId = int.tryParse(match.group(1)!) ?? 0;
+      } else if (!s.startsWith('/api/') && !s.startsWith('http')) {
+        category = s;
+      }
     }
 
     String manufacturer = '';
@@ -179,6 +189,7 @@ class Part {
       description: description,
       comment: comment,
       category: category,
+      categoryId: categoryId,
       manufacturer: manufacturer,
       tags: tags,
       partLots: lots,

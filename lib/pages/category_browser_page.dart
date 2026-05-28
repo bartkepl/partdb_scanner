@@ -68,13 +68,22 @@ class _CategoryBrowserPageState extends State<CategoryBrowserPage> {
     return roots;
   }
 
-  void _openParts(PartCategory cat) {
+  Set<int> _collectIds(_CategoryNode node) {
+    final ids = <int>{node.category.id};
+    for (final child in node.children) {
+      ids.addAll(_collectIds(child));
+    }
+    return ids;
+  }
+
+  void _openParts(_CategoryNode node) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => _CategoryPartsPage(
           apiService: widget.apiService,
-          category: cat,
+          categoryTitle: node.category.name,
+          categoryIds: _collectIds(node),
         ),
       ),
     );
@@ -112,7 +121,7 @@ class _CategoryBrowserPageState extends State<CategoryBrowserPage> {
 class _CategoryTile extends StatelessWidget {
   final _CategoryNode node;
   final int depth;
-  final void Function(PartCategory) onOpenParts;
+  final void Function(_CategoryNode) onOpenParts;
   final void Function(_CategoryNode) onToggle;
 
   const _CategoryTile({
@@ -152,7 +161,7 @@ class _CategoryTile extends StatelessWidget {
             // Nazwa kategorii — osobny obszar kliknięcia, otwiera listę części
             Expanded(
               child: InkWell(
-                onTap: () => onOpenParts(node.category),
+                onTap: () => onOpenParts(node),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
                   child: Row(
@@ -193,8 +202,9 @@ class _CategoryTile extends StatelessWidget {
 
 class _CategoryPartsPage extends StatefulWidget {
   final ApiService apiService;
-  final PartCategory category;
-  const _CategoryPartsPage({required this.apiService, required this.category});
+  final String categoryTitle;
+  final Set<int> categoryIds;
+  const _CategoryPartsPage({required this.apiService, required this.categoryTitle, required this.categoryIds});
 
   @override
   State<_CategoryPartsPage> createState() => _CategoryPartsPageState();
@@ -216,7 +226,7 @@ class _CategoryPartsPageState extends State<_CategoryPartsPage> {
     try {
       final all = await widget.apiService.fetchAllParts();
       final filtered = all
-          .where((p) => p.category == widget.category.name)
+          .where((p) => widget.categoryIds.contains(p.categoryId))
           .toList()
         ..sort((a, b) => a.name.compareTo(b.name));
       setState(() => _parts = filtered);
@@ -231,7 +241,7 @@ class _CategoryPartsPageState extends State<_CategoryPartsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category.name),
+        title: Text(widget.categoryTitle),
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
         ],
