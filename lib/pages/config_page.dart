@@ -27,6 +27,8 @@ class _ConfigPageState extends State<ConfigPage> {
   bool _tokenHidden = false;
   String _status = '';
   String _appVersion = '';
+  bool _sunmiEnabled = true;
+  bool _niimbotEnabled = true;
 
   @override
   void initState() {
@@ -36,6 +38,8 @@ class _ConfigPageState extends State<ConfigPage> {
     _tokenController.text = widget.apiService.token;
     _tokenHidden = widget.apiService.token.isNotEmpty;
     _selectedZoom = widget.apiService.zoomLevel;
+    _sunmiEnabled = widget.apiService.sunmiEnabled;
+    _niimbotEnabled = widget.apiService.niimbotEnabled;
   }
 
   Future<void> _loadAppVersion() async {
@@ -169,6 +173,38 @@ class _ConfigPageState extends State<ConfigPage> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            const Divider(),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  'Drukarki',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            SwitchListTile(
+              title: const Text('Drukarka Sunmi'),
+              subtitle: const Text('Drukowanie paragonów/etykiet przez Sunmi'),
+              value: _sunmiEnabled,
+              onChanged: (value) {
+                setState(() => _sunmiEnabled = value);
+                widget.apiService.saveSunmiEnabled(value);
+              },
+              contentPadding: EdgeInsets.zero,
+            ),
+            SwitchListTile(
+              title: const Text('Drukarka Niimbot'),
+              subtitle: const Text('Drukowanie etykiet przez Niimbot Bluetooth'),
+              value: _niimbotEnabled,
+              onChanged: (value) {
+                setState(() => _niimbotEnabled = value);
+                widget.apiService.saveNiimbotEnabled(value);
+              },
+              contentPadding: EdgeInsets.zero,
             ),
             const Spacer(),
             const SizedBox(height: 16),

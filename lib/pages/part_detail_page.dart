@@ -281,28 +281,30 @@ class _PartDetailPageState extends State<PartDetailPage> {
                 onPressed: _refreshing ? null : _refreshData,
                 child: const Text('Odśwież'),
               ),
-              MenuItemButton(
-                leadingIcon: const Icon(Icons.print),
-                onPressed: () async {
-                  try {
-                    await PrinterService.printPart(_part);
-                    _showToast('Wydrukowano');
-                  } catch (e) {
-                    _showToast('Błąd drukowania: $e', isError: true);
-                  }
-                },
-                child: const Text('Drukuj (Sunmi)'),
-              ),
-              MenuItemButton(
-                leadingIcon: const Icon(Icons.label_outline),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => LabelPrintPage(part: _part),
-                  ),
+              if (widget.apiService.sunmiEnabled)
+                MenuItemButton(
+                  leadingIcon: const Icon(Icons.print),
+                  onPressed: () async {
+                    try {
+                      await PrinterService.printPart(_part);
+                      _showToast('Wydrukowano');
+                    } catch (e) {
+                      _showToast('Błąd drukowania: $e', isError: true);
+                    }
+                  },
+                  child: const Text('Drukuj (Sunmi)'),
                 ),
-                child: const Text('Etykiety Niimbot'),
-              ),
+              if (widget.apiService.niimbotEnabled)
+                MenuItemButton(
+                  leadingIcon: const Icon(Icons.label_outline),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LabelPrintPage(part: _part),
+                    ),
+                  ),
+                  child: const Text('Etykiety Niimbot'),
+                ),
               MenuItemButton(
                 leadingIcon: const Icon(Icons.add_a_photo),
                 onPressed: _saving ? null : _addPhoto,

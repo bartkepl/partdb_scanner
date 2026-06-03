@@ -13,6 +13,8 @@ class ApiService extends ChangeNotifier {
   String baseUrl = '';
   String token = '';
   double zoomLevel = 2.0;
+  bool sunmiEnabled = true;
+  bool niimbotEnabled = true;
   final _secureStorage = const FlutterSecureStorage();
 
   ApiService();
@@ -21,10 +23,14 @@ class ApiService extends ChangeNotifier {
     final url = await _secureStorage.read(key: 'partdb_base_url');
     final t = await _secureStorage.read(key: 'partdb_token');
     final zoom = await _secureStorage.read(key: 'camera_zoom');
+    final sunmi = await _secureStorage.read(key: 'printer_sunmi_enabled');
+    final niimbot = await _secureStorage.read(key: 'printer_niimbot_enabled');
 
     baseUrl = url ?? '';
     token = t ?? '';
     zoomLevel = double.tryParse(zoom ?? '2.0') ?? 2.0;
+    sunmiEnabled = sunmi != 'false';
+    niimbotEnabled = niimbot != 'false';
   }
 
   Future<void> saveConfig(String url, String t) async {
@@ -38,6 +44,18 @@ class ApiService extends ChangeNotifier {
   Future<void> saveZoomLevel(double zoom) async {
     await _secureStorage.write(key: 'camera_zoom', value: zoom.toString());
     zoomLevel = zoom;
+    notifyListeners();
+  }
+
+  Future<void> saveSunmiEnabled(bool enabled) async {
+    await _secureStorage.write(key: 'printer_sunmi_enabled', value: enabled.toString());
+    sunmiEnabled = enabled;
+    notifyListeners();
+  }
+
+  Future<void> saveNiimbotEnabled(bool enabled) async {
+    await _secureStorage.write(key: 'printer_niimbot_enabled', value: enabled.toString());
+    niimbotEnabled = enabled;
     notifyListeners();
   }
 
