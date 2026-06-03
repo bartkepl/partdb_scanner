@@ -40,7 +40,8 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   package_info_plus: 4.2.0
   sunmi_printer_plus: ^4.1.1
-  niim_blue_flutter: ^1.0.0
+  niim_blue_flutter:
+    path: packages/niim_blue_flutter
   permission_handler: ^11.3.0
   image_picker: ^1.1.2
   share_plus: ^10.1.2
