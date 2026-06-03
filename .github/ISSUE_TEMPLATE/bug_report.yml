@@ -1,0 +1,49 @@
+name: Zgłoszenie błędu
+description: Zgłoś błąd w działaniu aplikacji
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Dziękujemy za zgłoszenie! Uzupełnij poniższe pola, aby ułatwić odtworzenie problemu.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Opis błędu
+      description: Co się dzieje? Co powinno się dziać?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Kroki do odtworzenia
+      placeholder: |
+        1. Otwórz ekran '...'
+        2. Kliknij '...'
+        3. Widzę błąd '...'
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Wersja aplikacji
+      description: Widoczna w zakładce Konfiguracja (np. 0.2.17)
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Model urządzenia i wersja Androida
+      placeholder: np. Samsung Galaxy A52, Android 13
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logi / komunikat błędu
+      description: Wklej ewentualne logi lub zrzuty ekranu.
+      render: shell
