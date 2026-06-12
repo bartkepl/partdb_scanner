@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.partdb_scanner"
+    namespace = "com.bartkepl.partdb_scanner"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.partdb_scanner"
+        applicationId = "com.bartkepl.partdb_scanner"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

@@ -1,19 +1,25 @@
 class PartLot {
   final int id;
   final String locationName;
+  final String locationIri;
   double amount;
 
   PartLot({
     required this.id,
     required this.locationName,
+    required this.locationIri,
     required this.amount,
   });
 
   factory PartLot.fromJson(Map<String, dynamic> json) {
-    final loc = json['storage_location'] ?? {};
+    final loc = json['storage_location'];
+    final locMap = loc is Map ? loc : <String, dynamic>{};
+    final locId = locMap['id'];
+    final locIdInt = locId is int ? locId : int.tryParse(locId?.toString() ?? '') ?? 0;
     return PartLot(
       id: json['id'] ?? 0,
-      locationName: loc['name']?.toString() ?? 'Brak',
+      locationName: locMap['name']?.toString() ?? 'Brak',
+      locationIri: locIdInt != 0 ? '/api/storage_locations/$locIdInt' : '',
       amount: (json['amount'] is num)
           ? (json['amount'] as num).toDouble()
           : double.tryParse(json['amount']?.toString() ?? '0') ?? 0.0,
@@ -88,6 +94,7 @@ class Part {
   final String tags;
   final List<PartLot> partLots;
   final List<PartParameter> parameters;
+  final bool needsReview;
 
   Part({
     required this.id,
@@ -103,6 +110,7 @@ class Part {
     this.tags = '',
     required this.partLots,
     required this.parameters,
+    this.needsReview = false,
   });
 
   int get totalStock => partLots.isEmpty
@@ -194,6 +202,37 @@ class Part {
       tags: tags,
       partLots: lots,
       parameters: params,
+      needsReview: json['needs_review'] as bool? ?? false,
     );
   }
+}
+
+class StorageLocation {
+  final int id;
+  final String name;
+  final String fullPath;
+
+  String get iri => '/api/storage_locations/$id';
+
+  StorageLocation({required this.id, required this.name, required this.fullPath});
+
+  factory StorageLocation.fromJson(Map<String, dynamic> json) {
+    final id = json['id'] is int
+        ? json['id'] as int
+        : int.tryParse(json['id']?.toString() ?? '0') ?? 0;
+    return StorageLocation(
+      id: id,
+      name: json['name']?.toString() ?? '',
+      fullPath: json['full_path']?.toString() ?? json['name']?.toString() ?? '',
+    );
+  }
+
+  @override
+  bool operator ==(Object other) => other is StorageLocation && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  String toString() => fullPath.isNotEmpty ? fullPath : name;
 }

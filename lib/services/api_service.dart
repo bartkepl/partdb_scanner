@@ -102,6 +102,16 @@ class ApiService extends ChangeNotifier {
         onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
       );
 
+  Future<http.Response> _post(Uri uri, String body) =>
+      http.post(
+        uri,
+        headers: _headers(),
+        body: body,
+      ).timeout(
+        _timeout,
+        onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
+      );
+
   /// Wyciąga czytelny opis błędu z odpowiedzi PartDB (hydra:description / violations / detail).
   String _extractError(http.Response r, String fallback) {
     try {
@@ -361,6 +371,114 @@ class ApiService extends ChangeNotifier {
     return allMembers
         .map((m) => PartCategory.fromJson(Map<String, dynamic>.from(m as Map)))
         .toList();
+  }
+
+  Future<Part> fetchPartById(int partId) async {
+    final r = await _get(Uri.parse(_join('/api/parts/$partId')));
+    if (r.statusCode == 200) {
+      return Part.fromJson(Map<String, dynamic>.from(json.decode(r.body)));
+    } else {
+      throw ApiException(r.statusCode, 'Błąd pobierania części (${r.statusCode})');
+    }
+  }
+
+  Future<List<Part>> fetchPartsNeedingReview() async {
+    final List allMembers = [];
+    String? nextUrl = _join('/api/parts?needs_review=true&itemsPerPage=100');
+
+    while (nextUrl != null && allMembers.length < 2000) {
+      final r = await _get(Uri.parse(nextUrl));
+      if (r.statusCode != 200) {
+        throw ApiException(r.statusCode, 'Błąd pobierania części do przeglądu (${r.statusCode})');
+      }
+      final decoded = json.decode(r.body);
+      if (decoded is Map && decoded.containsKey('hydra:member')) {
+        allMembers.addAll(decoded['hydra:member'] as List);
+        final next = decoded['hydra:view']?['hydra:next'] as String?;
+        nextUrl = next != null ? _join(next) : null;
+      } else if (decoded is List) {
+        allMembers.addAll(decoded);
+        nextUrl = null;
+      } else {
+        nextUrl = null;
+      }
+    }
+
+    return allMembers
+        .map((m) => Part.fromJson(Map<String, dynamic>.from(m as Map)))
+        .toList();
+  }
+
+  Future<List<StorageLocation>> fetchStorageLocations() async {
+    final List allMembers = [];
+    String? nextUrl = _join('/api/storage_locations?itemsPerPage=200');
+
+    while (nextUrl != null) {
+      final r = await _get(Uri.parse(nextUrl));
+      if (r.statusCode != 200) {
+        throw ApiException(r.statusCode, 'Błąd pobierania lokalizacji (${r.statusCode})');
+      }
+      final decoded = json.decode(r.body);
+      if (decoded is Map && decoded.containsKey('hydra:member')) {
+        allMembers.addAll(decoded['hydra:member'] as List);
+        final next = decoded['hydra:view']?['hydra:next'] as String?;
+        nextUrl = next != null ? _join(next) : null;
+      } else if (decoded is List) {
+        allMembers.addAll(decoded);
+        nextUrl = null;
+      } else {
+        nextUrl = null;
+      }
+    }
+
+    return allMembers
+        .map((m) => StorageLocation.fromJson(Map<String, dynamic>.from(m as Map)))
+        .toList();
+  }
+
+  Future<void> patchPartNeedsReview(int partId, bool value) async {
+    final r = await _patch(
+      Uri.parse(_join('/api/parts/$partId')),
+      json.encode({'needs_review': value}),
+    );
+    if (r.statusCode != 200) {
+      throw ApiException(r.statusCode, _extractError(r, 'Błąd zapisu needs_review'));
+    }
+  }
+
+  Future<void> patchPartLotStorageLocation(int lotId, String locationIri) async {
+    final r = await _patch(
+      Uri.parse(_join('/api/part_lots/$lotId')),
+      json.encode({'storage_location': locationIri}),
+    );
+    if (r.statusCode != 200) {
+      throw ApiException(r.statusCode, _extractError(r, 'Błąd zapisu lokalizacji lotu'));
+    }
+  }
+
+  Future<void> patchPartLotAmount(int lotId, double amount) async {
+    final r = await _patch(
+      Uri.parse(_join('/api/part_lots/$lotId')),
+      json.encode({'amount': amount}),
+    );
+    if (r.statusCode != 200) {
+      throw ApiException(r.statusCode, _extractError(r, 'Błąd zapisu ilości lotu'));
+    }
+  }
+
+  /// Tworzy nowy lot w 2 krokach: POST (bez storage_location), potem PATCH z lokalizacją.
+  Future<PartLot> createPartLot(int partId, double amount, String locationIri) async {
+    final postR = await _post(
+      Uri.parse(_join('/api/part_lots')),
+      json.encode({'part': '/api/parts/$partId', 'amount': amount}),
+    );
+    if (postR.statusCode != 201) {
+      throw ApiException(postR.statusCode, _extractError(postR, 'Błąd tworzenia lotu'));
+    }
+    final created = PartLot.fromJson(Map<String, dynamic>.from(json.decode(postR.body)));
+
+    await patchPartLotStorageLocation(created.id, locationIri);
+    return created;
   }
 
   /// Cached IRI pierwszego dostępnego typu załącznika.

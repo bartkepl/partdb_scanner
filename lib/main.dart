@@ -4,6 +4,7 @@ import 'services/api_service.dart';
 import 'pages/category_browser_page.dart';
 import 'pages/config_page.dart';
 import 'pages/ipn_generator_page.dart';
+import 'pages/review_page.dart';
 import 'pages/search_page.dart';
 
 void main() async {
@@ -67,6 +68,7 @@ class _HomePageState extends State<HomePage> {
     _tabs.add(SearchPage(apiService: widget.apiService));
     _tabs.add(IpnGeneratorPage(apiService: widget.apiService));
     _tabs.add(CategoryBrowserPage(apiService: widget.apiService));
+    _tabs.add(ReviewPage(apiService: widget.apiService));
     _tabs.add(ConfigPage(apiService: widget.apiService));
     _checkLowStock();
   }
@@ -109,6 +111,7 @@ class _HomePageState extends State<HomePage> {
       body: _tabs[_index],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
+        type: BottomNavigationBarType.fixed,
         backgroundColor: const Color(0xFF1E1E1E),
         selectedItemColor: Colors.orange,
         unselectedItemColor: Colors.white70,
@@ -124,6 +127,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const BottomNavigationBarItem(icon: Icon(Icons.label), label: 'Generator IPN'),
           const BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Kategorie'),
+          const BottomNavigationBarItem(icon: Icon(Icons.fact_check_outlined), label: 'Przegląd'),
           const BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Konfiguracja'),
         ],
         onTap: (i) => setState(() => _index = i),

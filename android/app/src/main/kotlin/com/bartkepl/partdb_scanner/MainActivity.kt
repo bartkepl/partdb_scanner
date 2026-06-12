@@ -1,4 +1,4 @@
-package com.example.partdb_scanner
+package com.bartkepl.partdb_scanner
 
 import io.flutter.embedding.android.FlutterActivity
 
