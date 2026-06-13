@@ -1,4 +1,4 @@
-name: Flutter APK Auto Version Release
+name: Flutter APK Release
 
 on:
   push:
@@ -14,78 +14,65 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          version: 3.13.6
+          channel: stable
+          cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
-      # 🔥 Pobranie ostatniego taga
-      - name: Get latest tag
-        id: get_tag
-        run: |
-          git fetch --tags
-          latestTag=$(git tag --sort=-v:refname | head -n 1)
-          echo "Latest tag: $latestTag"
-          echo "tag=$latestTag" >> $GITHUB_OUTPUT
-
-      # 🔥 Obliczenie nowej wersji
-      - name: Calculate next version
+      - name: Get version from pubspec.yaml
         id: version
         run: |
-          latest=${{ steps.get_tag.outputs.tag }}
+          version=$(grep '^version:' pubspec.yaml | sed 's/version: *//')
+          version_name=$(echo "$version" | cut -d'+' -f1)
+          tag="v${version_name}"
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "version_name=$version_name" >> $GITHUB_OUTPUT
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "Version: $version, Tag: $tag"
 
-          if [ -z "$latest" ]; then
-            newTag="v0.2.4"
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          tag=${{ steps.version.outputs.tag }}
+          if git ls-remote --tags origin "refs/tags/$tag" | grep -q .; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $tag already exists, skipping release."
           else
-            version=${latest#v}
-            IFS='.' read -r major minor patch <<< "$version"
-            patch=$((patch + 1))
-            newTag="v$major.$minor.$patch"
+            echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-          echo "newTag=$newTag"
-          echo "newTag=$newTag" >> $GITHUB_OUTPUT
-
-      # 🔥 Nadpisanie pubspec.yaml tylko w runnerze
-      #- name: Update pubspec version (temporary)
-        #run: |
-          #version=${{ steps.version.outputs.newTag }}
-          #cleanVersion=${version#v}
-
-          #echo "Setting version to $cleanVersion+1"
-          #sed -i "s/^version:.*/version: $cleanVersion+1/" pubspec.yaml
-
-      # 🔥 Build z nową wersją
       - name: Build APK
+        if: steps.check_tag.outputs.exists == 'false'
         run: flutter build apk --release
 
-      # 🔥 Przygotowanie APK
       - name: Prepare APK
+        if: steps.check_tag.outputs.exists == 'false'
         run: |
           mkdir -p build/apk
-          cp build/app/outputs/flutter-apk/app-release.apk build/apk/partdb_scanner.apk
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             build/apk/partdb_scanner-${{ steps.version.outputs.version_name }}.apk
 
-
-      # 🔥 Tworzenie taga (bez commitów)
       - name: Create Tag
+        if: steps.check_tag.outputs.exists == 'false'
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git tag ${{ steps.version.outputs.newTag }}
-          git push origin ${{ steps.version.outputs.newTag }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.version.outputs.tag }}
+          git push origin ${{ steps.version.outputs.tag }}
 
-      # 🔥 Release
       - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.version.outputs.newTag }}
-          name: PartDB Scanner ${{ steps.version.outputs.newTag }}
-          artifacts: build/apk/partdb_scanner.apk
+          tag: ${{ steps.version.outputs.tag }}
+          name: PartDB Scanner ${{ steps.version.outputs.version_name }}
+          artifacts: build/apk/partdb_scanner-${{ steps.version.outputs.version_name }}.apk
           token: ${{ secrets.GITHUB_TOKEN }}
