@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import '../l10n/app_localizations.dart';
 import '../services/api_service.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 
@@ -12,7 +13,6 @@ class BarcodeScanPage extends StatefulWidget {
   State<BarcodeScanPage> createState() => _BarcodeScanPageState();
 }
 
-/// 🔀 Typy skanowania
 enum ScanType {
   all,
   qr,
@@ -34,12 +34,9 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
   void initState() {
     super.initState();
     _initCamera();
-    _scanner = BarcodeScanner(
-      formats: _getFormats(),
-    );
+    _scanner = BarcodeScanner(formats: _getFormats());
   }
 
-  /// 🔧 Mapowanie typów
   List<BarcodeFormat> _getFormats() {
     switch (_scanType) {
       case ScanType.qr:
@@ -83,13 +80,10 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
 
   Future<void> _toggleTorch() async {
     if (_cameraController == null) return;
-
     _torchOn = !_torchOn;
-
     await _cameraController!.setFlashMode(
       _torchOn ? FlashMode.torch : FlashMode.off,
     );
-
     setState(() {});
   }
 
@@ -122,16 +116,16 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
     });
   }
 
-  /// 🔀 Popup wyboru typu
   Future<void> _selectScanType() async {
+    final l10n = AppLocalizations.of(context)!;
     final result = await showDialog<ScanType>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text("Wybierz typ kodu"),
+        title: Text(l10n.selectCodeType),
         children: [
           SimpleDialogOption(
             onPressed: () => Navigator.pop(context, ScanType.all),
-            child: const Text("Wszystkie"),
+            child: const Text("Auto"),
           ),
           SimpleDialogOption(
             onPressed: () => Navigator.pop(context, ScanType.qr),
@@ -156,12 +150,8 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
     if (result != null) {
       setState(() {
         _scanType = result;
-
-        /// restart skanera
         _scanner.close();
-        _scanner = BarcodeScanner(
-          formats: _getFormats(),
-        );
+        _scanner = BarcodeScanner(formats: _getFormats());
       });
     }
   }
@@ -201,12 +191,10 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
     super.dispose();
   }
 
-  /// 🎯 Overlay
   Widget _buildOverlay() {
     final size = MediaQuery.of(context).size.width;
 
     if (_is2D()) {
-      /// 🔳 2D (QR / DataMatrix)
       return Center(
         child: Container(
           width: size * 0.6,
@@ -217,7 +205,6 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
         ),
       );
     } else {
-      /// 📏 1D (EAN / Code128)
       return Center(
         child: Container(
           width: size * 0.8,
@@ -232,10 +219,11 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final controller = _cameraController;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Skanuj kod")),
+      appBar: AppBar(title: Text(l10n.scanTitle)),
       backgroundColor: Colors.black,
       body: controller == null || !controller.value.isInitialized
           ? const Center(child: CircularProgressIndicator())
@@ -243,21 +231,18 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
         children: [
           CameraPreview(controller),
 
-          /// 🎯 Overlay dynamiczny
           _buildOverlay(),
 
-          /// ℹ️ Informacja o trybie
           Positioned(
             top: 20,
             left: 0,
             right: 0,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 color: Colors.black54,
                 child: Text(
-                  "Tryb: ${_getScanTypeLabel()}",
+                  l10n.scanMode(_getScanTypeLabel()),
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
@@ -270,7 +255,6 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
             right: 20,
             child: Row(
               children: [
-                /// 🔦 LATARKA
                 SizedBox(
                   width: 56,
                   height: 56,
@@ -280,24 +264,18 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
                       padding: EdgeInsets.zero,
                       shape: const CircleBorder(),
                     ),
-                    child: Icon(
-                      _torchOn
-                          ? Icons.flash_on
-                          : Icons.flash_off,
-                    ),
+                    child: Icon(_torchOn ? Icons.flash_on : Icons.flash_off),
                   ),
                 ),
 
                 const SizedBox(width: 12),
 
-                /// 📷 SKANUJ
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.camera),
-                    label: const Text("Skanuj"),
+                    label: Text(l10n.scan),
                     style: ElevatedButton.styleFrom(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     onPressed: _scan,
                   ),
@@ -305,7 +283,6 @@ class _BarcodeScanPageState extends State<BarcodeScanPage> {
 
                 const SizedBox(width: 12),
 
-                /// 🔀 WYBÓR TYPU
                 SizedBox(
                   width: 56,
                   height: 56,

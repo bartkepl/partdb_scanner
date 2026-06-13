@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'services/api_service.dart';
 import 'pages/category_browser_page.dart';
@@ -22,28 +23,33 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ApiService>.value(
       value: apiService,
-      child: MaterialApp(
-        title: 'Part-DB Scanner',
-        debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.dark,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
-          useMaterial3: true,
-          brightness: Brightness.light,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.orange,
-            brightness: Brightness.dark,
+      child: Consumer<ApiService>(
+        builder: (_, api, __) => MaterialApp(
+          title: 'Part-DB Scanner',
+          debugShowCheckedModeBanner: false,
+          themeMode: ThemeMode.dark,
+          locale: Locale(api.locale),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+            useMaterial3: true,
+            brightness: Brightness.light,
           ),
-          scaffoldBackgroundColor: const Color(0xFF121212),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Color(0xFF1E1E1E),
-            foregroundColor: Colors.white,
-            elevation: 1,
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.orange,
+              brightness: Brightness.dark,
+            ),
+            scaffoldBackgroundColor: const Color(0xFF121212),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF1E1E1E),
+              foregroundColor: Colors.white,
+              elevation: 1,
+            ),
           ),
+          home: HomePage(apiService: apiService),
         ),
-        home: HomePage(apiService: apiService),
       ),
     );
   }
@@ -79,34 +85,34 @@ class _HomePageState extends State<HomePage> {
       final parts = await widget.apiService.fetchAllParts();
       final count = parts.where((p) => p.isLowStock).length;
       if (count > 0 && mounted) {
+        final l10n = AppLocalizations.of(context)!;
         setState(() => _lowStockCount = count);
         ScaffoldMessenger.of(context).showMaterialBanner(
           MaterialBanner(
             leading: const Icon(Icons.warning_amber, color: Colors.orange),
-            content: Text('$count części ma niski stan magazynowy'),
+            content: Text(l10n.lowStockBanner(count)),
             actions: [
               TextButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
                   setState(() => _index = 0);
                 },
-                child: const Text('Pokaż'),
+                child: Text(l10n.show),
               ),
               TextButton(
                 onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
-                child: const Text('Zamknij'),
+                child: Text(l10n.dismiss),
               ),
             ],
           ),
         );
       }
-    } catch (_) {
-      // cicho — nie blokujemy startu aplikacji
-    }
+    } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: _tabs[_index],
       bottomNavigationBar: BottomNavigationBar(
@@ -123,12 +129,12 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Colors.red,
               child: const Icon(Icons.search),
             ),
-            label: 'Wyszukaj',
+            label: l10n.navSearch,
           ),
-          const BottomNavigationBarItem(icon: Icon(Icons.label), label: 'Generator IPN'),
-          const BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Kategorie'),
-          const BottomNavigationBarItem(icon: Icon(Icons.fact_check_outlined), label: 'Przegląd'),
-          const BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Konfiguracja'),
+          BottomNavigationBarItem(icon: const Icon(Icons.label), label: l10n.navIpnGenerator),
+          BottomNavigationBarItem(icon: const Icon(Icons.folder), label: l10n.navCategories),
+          BottomNavigationBarItem(icon: const Icon(Icons.fact_check_outlined), label: l10n.navReview),
+          BottomNavigationBarItem(icon: const Icon(Icons.settings), label: l10n.navConfig),
         ],
         onTap: (i) => setState(() => _index = i),
       ),

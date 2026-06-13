@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/label_config.dart';
 import '../models/part.dart';
 import '../services/niimbot_service.dart';
@@ -28,8 +29,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
 
   late LabelConfig _config;
 
-  /// Kontrolery wartości parametrów – klucz: nazwa parametru.
-  /// Wstępnie wypełnione wartościami z bazy, edytowalne bez zapisu.
   final Map<String, TextEditingController> _valueControllers = {};
 
   @override
@@ -55,7 +54,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
 
     final config = LabelConfig.mergeWithParams(saved, paramNames);
 
-    // Utwórz kontrolery dla każdego parametru, wstępnie z wartością z bazy
     for (final entry in config.entries) {
       final dbParam = partParams.where((p) => p.name == entry.name).firstOrNull;
       final dbValue = dbParam != null
@@ -84,34 +82,39 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
   }
 
   Future<void> _connect() async {
-    setState(() => _status = 'Łączenie z drukarką...');
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _status = l10n.connecting);
     try {
       await _niimbot.connect();
-      setState(() => _status = '✅ Połączono');
+      if (!mounted) return;
+      setState(() => _status = l10n.connected);
     } catch (e) {
-      setState(() => _status = '❌ Błąd połączenia: $e');
+      if (!mounted) return;
+      setState(() => _status = l10n.connectionError(e.toString()));
     }
   }
 
   Future<void> _disconnect() async {
+    final l10n = AppLocalizations.of(context)!;
     await _niimbot.disconnect();
-    setState(() => _status = 'Rozłączono');
+    setState(() => _status = l10n.disconnected);
   }
 
   Future<void> _print() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_niimbot.isConnected) {
       await _connect();
       if (!_niimbot.isConnected) return;
     }
 
     if (!_printDrawer && !_printSpoolParam && !_printSpoolBarcode) {
-      setState(() => _status = '⚠️ Wybierz co najmniej jeden typ etykiety');
+      setState(() => _status = l10n.selectLabelTypeWarning);
       return;
     }
 
     setState(() {
       _printing = true;
-      _status = 'Drukuję...';
+      _status = l10n.printing;
     });
 
     try {
@@ -119,26 +122,32 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
       final params = _buildPrintParams();
 
       if (_printDrawer) {
-        setState(() => _status = 'Drukuję etykietę szufladkową...');
+        if (!mounted) return;
+        setState(() => _status = l10n.printingDrawerLabel);
         await _niimbot.printDrawerLabel(widget.part, fontSize: _drawerFontSize);
       }
 
       if (_printSpoolParam && _printSpoolBarcode) {
-        setState(() => _status = 'Drukuję etykiety szpulki...');
+        if (!mounted) return;
+        setState(() => _status = l10n.printingSpoolLabels);
         await _niimbot.printSpoolLabels(widget.part, params);
       } else if (_printSpoolParam) {
-        setState(() => _status = 'Drukuję etykietę parametrów...');
+        if (!mounted) return;
+        setState(() => _status = l10n.printingParamLabel);
         await _niimbot.printSpoolParamLabel(widget.part, params);
       } else if (_printSpoolBarcode) {
-        setState(() => _status = 'Drukuję etykietę z kodem 1D...');
+        if (!mounted) return;
+        setState(() => _status = l10n.printingBarcodeLabel);
         await _niimbot.printSpoolBarcodeLabel(widget.part);
       }
 
-      setState(() => _status = '✅ Wydrukowano');
+      if (!mounted) return;
+      setState(() => _status = l10n.printDone);
     } catch (e) {
-      setState(() => _status = '❌ Błąd drukowania: $e');
+      if (!mounted) return;
+      setState(() => _status = l10n.printError(e.toString()));
     } finally {
-      setState(() => _printing = false);
+      if (mounted) setState(() => _printing = false);
     }
   }
 
@@ -146,7 +155,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
     final newIndex = index + delta;
     if (newIndex < 0 || newIndex >= _config.entries.length) return;
     setState(() {
-      // Przenieś też kontroler wartości (trzymamy go w mapie po nazwie – OK)
       final entry = _config.entries.removeAt(index);
       _config.entries.insert(newIndex, entry);
     });
@@ -154,23 +162,24 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Etykiety: ${widget.part.name}',
+          l10n.labelsFor(widget.part.name),
           overflow: TextOverflow.ellipsis,
         ),
         actions: [
           if (_niimbot.isConnected)
             IconButton(
               icon: const Icon(Icons.bluetooth_connected, color: Colors.blue),
-              tooltip: 'Rozłącz drukarkę',
+              tooltip: l10n.disconnectPrinter,
               onPressed: _printing ? null : _disconnect,
             )
           else
             IconButton(
               icon: const Icon(Icons.bluetooth, color: Colors.grey),
-              tooltip: 'Połącz z drukarką',
+              tooltip: l10n.connectPrinter,
               onPressed: _printing ? null : _connect,
             ),
         ],
@@ -183,58 +192,58 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
                   child: ListView(
                     padding: const EdgeInsets.all(12),
                     children: [
-                      _buildLabelTypeSection(),
+                      _buildLabelTypeSection(l10n),
                       if (_printDrawer) ...[
                         const SizedBox(height: 16),
-                        _buildDrawerConfigSection(),
+                        _buildDrawerConfigSection(l10n),
                       ],
                       if (_printSpoolParam) ...[
                         const SizedBox(height: 16),
-                        _buildParamConfigSection(),
+                        _buildParamConfigSection(l10n),
                       ],
                     ],
                   ),
                 ),
-                _buildBottomBar(),
+                _buildBottomBar(l10n),
               ],
             ),
     );
   }
 
-  Widget _buildLabelTypeSection() {
+  Widget _buildLabelTypeSection(AppLocalizations l10n) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Text(
-                'Typ etykiety',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                l10n.labelTypeSection,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ),
             _LabelTypeRow(
               icon: Icons.inventory_2_outlined,
-              label: 'Szufladkowa 22×14mm',
-              sublabel: 'Nazwa + DataMatrix',
+              label: l10n.labelDrawer,
+              sublabel: l10n.labelDrawerSub,
               value: _printDrawer,
               onChanged: (v) => setState(() => _printDrawer = v),
             ),
             const Divider(height: 1, indent: 16),
             _LabelTypeRow(
               icon: Icons.view_list_outlined,
-              label: 'Szpulka – parametry 12×40mm',
-              sublabel: 'Tekst + DataMatrix',
+              label: l10n.labelSpoolParam,
+              sublabel: l10n.labelSpoolParamSub,
               value: _printSpoolParam,
               onChanged: (v) => setState(() => _printSpoolParam = v),
             ),
             const Divider(height: 1, indent: 16),
             _LabelTypeRow(
               icon: Icons.qr_code_2,
-              label: 'Szpulka – kod 1D 12×40mm',
-              sublabel: 'Kod kreskowy Code128',
+              label: l10n.labelSpoolBarcode,
+              sublabel: l10n.labelSpoolBarcodeSub,
               value: _printSpoolBarcode,
               onChanged: (v) => setState(() => _printSpoolBarcode = v),
             ),
@@ -244,25 +253,24 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
     );
   }
 
-  Widget _buildDrawerConfigSection() {
+  Widget _buildDrawerConfigSection(AppLocalizations l10n) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Konfiguracja etykiety szufladkowej',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+            Text(
+              l10n.drawerLabelConfig,
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 const Icon(Icons.format_size, size: 18, color: Colors.grey),
                 const SizedBox(width: 8),
-                const Text('Rozmiar tekstu nazwy:'),
+                Text(l10n.nameFontSize),
                 const Spacer(),
-                // Przycisk zmniejszenia
                 SizedBox(
                   width: 36,
                   height: 36,
@@ -275,7 +283,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
                         : null,
                   ),
                 ),
-                // Podgląd rozmiaru – tekst przykładowy
                 Container(
                   width: 80,
                   alignment: Alignment.center,
@@ -287,7 +294,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
                     ),
                   ),
                 ),
-                // Przycisk zwiększenia
                 SizedBox(
                   width: 36,
                   height: 36,
@@ -308,18 +314,18 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
     );
   }
 
-  Widget _buildParamConfigSection() {
+  Widget _buildParamConfigSection(AppLocalizations l10n) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 4, 16, 8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
               child: Text(
-                'Parametry na etykiecie szpulki',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                l10n.spoolLabelParams,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ),
             ..._config.entries.asMap().entries.map((mapEntry) {
@@ -334,14 +340,11 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Row(
                       children: [
-                        // Toggle włącz/wyłącz
                         Switch(
                           value: param.enabled,
                           onChanged: (v) => setState(() => param.enabled = v),
                         ),
                         const SizedBox(width: 4),
-
-                        // Pole edytowalne wartości + etykieta nazwy
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -376,8 +379,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
                             ],
                           ),
                         ),
-
-                        // Przyciski kolejności + Bold
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -391,7 +392,6 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
                                 onPressed: i > 0 ? () => _moveParam(i, -1) : null,
                               ),
                             ),
-                            // Przycisk Bold
                             SizedBox(
                               width: 32,
                               height: 28,
@@ -444,7 +444,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(AppLocalizations l10n) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -469,7 +469,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
                     flex: 1,
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.bluetooth),
-                      label: const Text('Połącz'),
+                      label: Text(l10n.connect),
                       onPressed: _printing ? null : _connect,
                     ),
                   ),
@@ -485,7 +485,7 @@ class _LabelPrintPageState extends State<LabelPrintPage> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.print),
-                    label: const Text('Drukuj'),
+                    label: Text(l10n.print),
                     onPressed: _printing ? null : _print,
                   ),
                 ),

@@ -15,6 +15,7 @@ class ApiService extends ChangeNotifier {
   double zoomLevel = 2.0;
   bool sunmiEnabled = true;
   bool niimbotEnabled = true;
+  String locale = 'en';
   final _secureStorage = const FlutterSecureStorage();
 
   ApiService();
@@ -25,12 +26,14 @@ class ApiService extends ChangeNotifier {
     final zoom = await _secureStorage.read(key: 'camera_zoom');
     final sunmi = await _secureStorage.read(key: 'printer_sunmi_enabled');
     final niimbot = await _secureStorage.read(key: 'printer_niimbot_enabled');
+    final loc = await _secureStorage.read(key: 'app_locale');
 
     baseUrl = url ?? '';
     token = t ?? '';
     zoomLevel = double.tryParse(zoom ?? '2.0') ?? 2.0;
     sunmiEnabled = sunmi != 'false';
     niimbotEnabled = niimbot != 'false';
+    locale = loc ?? 'en';
   }
 
   Future<void> saveConfig(String url, String t) async {
@@ -56,6 +59,12 @@ class ApiService extends ChangeNotifier {
   Future<void> saveNiimbotEnabled(bool enabled) async {
     await _secureStorage.write(key: 'printer_niimbot_enabled', value: enabled.toString());
     niimbotEnabled = enabled;
+    notifyListeners();
+  }
+
+  Future<void> saveLocale(String newLocale) async {
+    await _secureStorage.write(key: 'app_locale', value: newLocale);
+    locale = newLocale;
     notifyListeners();
   }
 
@@ -89,7 +98,7 @@ class ApiService extends ChangeNotifier {
   Future<http.Response> _get(Uri uri) =>
       http.get(uri, headers: _headers()).timeout(
         _timeout,
-        onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
+        onTimeout: () => throw TimeoutException('No server response (timeout 10s)'),
       );
 
   Future<http.Response> _patch(Uri uri, String body) =>
@@ -99,7 +108,7 @@ class ApiService extends ChangeNotifier {
         body: body,
       ).timeout(
         _timeout,
-        onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
+        onTimeout: () => throw TimeoutException('No server response (timeout 10s)'),
       );
 
   Future<http.Response> _post(Uri uri, String body) =>
@@ -109,7 +118,7 @@ class ApiService extends ChangeNotifier {
         body: body,
       ).timeout(
         _timeout,
-        onTimeout: () => throw TimeoutException('Brak odpowiedzi serwera (timeout 10s)'),
+        onTimeout: () => throw TimeoutException('No server response (timeout 10s)'),
       );
 
   /// Wyciąga czytelny opis błędu z odpowiedzi PartDB (hydra:description / violations / detail).
@@ -142,7 +151,7 @@ class ApiService extends ChangeNotifier {
     if (r.statusCode == 200) {
       return json.decode(r.body) as Map<String, dynamic>;
     } else {
-      throw ApiException(r.statusCode, 'Błąd weryfikacji tokenu (${r.statusCode})');
+      throw ApiException(r.statusCode, 'Token verification error (${r.statusCode})');
     }
   }
 
@@ -160,17 +169,17 @@ class ApiService extends ChangeNotifier {
         if (members is List && members.isNotEmpty) {
           return Part.fromJson(Map<String, dynamic>.from(members.first));
         } else {
-          throw ApiException(404, 'Nie znaleziono części o IPN=$ipn');
+          throw ApiException(404, 'Part not found: IPN=$ipn');
         }
       } else if (decoded is List && decoded.isNotEmpty) {
         return Part.fromJson(Map<String, dynamic>.from(decoded.first));
       } else if (decoded is Map && decoded.containsKey('id')) {
         return Part.fromJson(Map<String, dynamic>.from(decoded));
       } else {
-        throw ApiException(404, 'Nie znaleziono części o IPN=$ipn');
+        throw ApiException(404, 'Part not found: IPN=$ipn');
       }
     } else {
-      throw ApiException(r.statusCode, 'Błąd wyszukiwania IPN (${r.statusCode})');
+      throw ApiException(r.statusCode, 'IPN search error (${r.statusCode})');
     }
   }
 
@@ -181,7 +190,7 @@ class ApiService extends ChangeNotifier {
     while (nextUrl != null && allMembers.length < 2000) {
       final r = await _get(Uri.parse(nextUrl));
       if (r.statusCode != 200) {
-        throw ApiException(r.statusCode, 'Błąd pobierania listy części (${r.statusCode})');
+        throw ApiException(r.statusCode, 'Fetch parts error (${r.statusCode})');
       }
       final decoded = json.decode(r.body);
       if (decoded is Map && decoded.containsKey('hydra:member')) {
@@ -211,7 +220,7 @@ class ApiService extends ChangeNotifier {
     while (nextUrl != null && allMembers.length < 200) {
       final r = await _get(Uri.parse(nextUrl));
       if (r.statusCode != 200) {
-        throw ApiException(r.statusCode, 'Błąd wyszukiwania (${r.statusCode})');
+        throw ApiException(r.statusCode, 'Search error (${r.statusCode})');
       }
       final decoded = json.decode(r.body);
       if (decoded is Map && decoded.containsKey('hydra:member')) {
@@ -269,7 +278,7 @@ class ApiService extends ChangeNotifier {
     if (r.statusCode == 200) {
       return PartLot.fromJson(Map<String, dynamic>.from(json.decode(r.body)));
     } else {
-      throw ApiException(r.statusCode, 'Błąd zapisu stanu magazynowego (${r.statusCode})');
+      throw ApiException(r.statusCode, 'Stock save error (${r.statusCode})');
     }
   }
 
@@ -280,7 +289,7 @@ class ApiService extends ChangeNotifier {
     );
 
     if (r.statusCode != 200) {
-      throw ApiException(r.statusCode, 'Błąd zapisu parametru (${r.statusCode})');
+      throw ApiException(r.statusCode, 'Parameter save error (${r.statusCode})');
     }
   }
 
@@ -291,7 +300,7 @@ class ApiService extends ChangeNotifier {
     );
 
     if (r.statusCode != 200) {
-      throw ApiException(r.statusCode, 'Błąd zapisu IPN (${r.statusCode})');
+      throw ApiException(r.statusCode, 'IPN save error (${r.statusCode})');
     }
   }
 
@@ -342,7 +351,7 @@ class ApiService extends ChangeNotifier {
 
       return PartDetails(params: params, category: category, manufacturer: manufacturer);
     } else {
-      throw ApiException(r.statusCode, 'Błąd pobierania parametrów (${r.statusCode})');
+      throw ApiException(r.statusCode, 'Fetch parameters error (${r.statusCode})');
     }
   }
 
@@ -353,7 +362,7 @@ class ApiService extends ChangeNotifier {
     while (nextUrl != null) {
       final r = await _get(Uri.parse(nextUrl));
       if (r.statusCode != 200) {
-        throw ApiException(r.statusCode, 'Błąd pobierania kategorii (${r.statusCode})');
+        throw ApiException(r.statusCode, 'Fetch categories error (${r.statusCode})');
       }
       final decoded = json.decode(r.body);
       if (decoded is Map && decoded.containsKey('hydra:member')) {
@@ -378,7 +387,7 @@ class ApiService extends ChangeNotifier {
     if (r.statusCode == 200) {
       return Part.fromJson(Map<String, dynamic>.from(json.decode(r.body)));
     } else {
-      throw ApiException(r.statusCode, 'Błąd pobierania części (${r.statusCode})');
+      throw ApiException(r.statusCode, 'Fetch part error (${r.statusCode})');
     }
   }
 
@@ -389,7 +398,7 @@ class ApiService extends ChangeNotifier {
     while (nextUrl != null && allMembers.length < 2000) {
       final r = await _get(Uri.parse(nextUrl));
       if (r.statusCode != 200) {
-        throw ApiException(r.statusCode, 'Błąd pobierania części do przeglądu (${r.statusCode})');
+        throw ApiException(r.statusCode, 'Fetch review parts error (${r.statusCode})');
       }
       final decoded = json.decode(r.body);
       if (decoded is Map && decoded.containsKey('hydra:member')) {
@@ -416,7 +425,7 @@ class ApiService extends ChangeNotifier {
     while (nextUrl != null) {
       final r = await _get(Uri.parse(nextUrl));
       if (r.statusCode != 200) {
-        throw ApiException(r.statusCode, 'Błąd pobierania lokalizacji (${r.statusCode})');
+        throw ApiException(r.statusCode, 'Fetch locations error (${r.statusCode})');
       }
       final decoded = json.decode(r.body);
       if (decoded is Map && decoded.containsKey('hydra:member')) {
@@ -442,7 +451,7 @@ class ApiService extends ChangeNotifier {
       json.encode({'needs_review': value}),
     );
     if (r.statusCode != 200) {
-      throw ApiException(r.statusCode, _extractError(r, 'Błąd zapisu needs_review'));
+      throw ApiException(r.statusCode, _extractError(r, 'Save needs_review error'));
     }
   }
 
@@ -452,7 +461,7 @@ class ApiService extends ChangeNotifier {
       json.encode({'storage_location': locationIri}),
     );
     if (r.statusCode != 200) {
-      throw ApiException(r.statusCode, _extractError(r, 'Błąd zapisu lokalizacji lotu'));
+      throw ApiException(r.statusCode, _extractError(r, 'Save lot location error'));
     }
   }
 
@@ -462,7 +471,7 @@ class ApiService extends ChangeNotifier {
       json.encode({'amount': amount}),
     );
     if (r.statusCode != 200) {
-      throw ApiException(r.statusCode, _extractError(r, 'Błąd zapisu ilości lotu'));
+      throw ApiException(r.statusCode, _extractError(r, 'Save lot amount error'));
     }
   }
 
@@ -473,7 +482,7 @@ class ApiService extends ChangeNotifier {
       json.encode({'part': '/api/parts/$partId', 'amount': amount}),
     );
     if (postR.statusCode != 201) {
-      throw ApiException(postR.statusCode, _extractError(postR, 'Błąd tworzenia lotu'));
+      throw ApiException(postR.statusCode, _extractError(postR, 'Create lot error'));
     }
     final created = PartLot.fromJson(Map<String, dynamic>.from(json.decode(postR.body)));
 
@@ -530,7 +539,7 @@ class ApiService extends ChangeNotifier {
     );
 
     if (r.statusCode != 201 && r.statusCode != 200) {
-      throw ApiException(r.statusCode, _extractError(r, 'Błąd wysyłania załącznika'));
+      throw ApiException(r.statusCode, _extractError(r, 'Upload attachment error'));
     }
   }
 

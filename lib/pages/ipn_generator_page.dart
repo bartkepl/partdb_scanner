@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
 
@@ -18,9 +19,7 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
   bool _saving = false;
   String _message = '';
 
-  // wyniki ostatniego generowania: partId -> wygenerowany IPN
   Map<int, String> _generated = {};
-  // wyniki wysyłania: partId -> sukces/błąd
   Map<int, String?> _saveResults = {};
 
   @override
@@ -39,14 +38,17 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
     });
     try {
       final all = await widget.apiService.fetchAllParts();
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
         _partsWithoutIpn = all.where((p) => p.partNumber.trim().isEmpty).toList();
-        _message = _partsWithoutIpn.isEmpty ? 'Wszystkie części mają już IPN.' : '';
+        _message = _partsWithoutIpn.isEmpty ? l10n.allPartsHaveIpn : '';
       });
     } catch (e) {
-      setState(() => _message = '❌ Błąd pobierania: $e');
+      if (!mounted) return;
+      setState(() => _message = AppLocalizations.of(context)!.fetchError(e.toString()));
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -77,12 +79,14 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
     });
 
     try {
+      final l10n = AppLocalizations.of(context)!;
       final all = await widget.apiService.fetchAllParts();
       final existingIPNs = all.map((p) => p.partNumber.trim()).toSet();
       final targets = _partsWithoutIpn.where((p) => _selected.contains(p.id)).toList();
       final generated = _generateIPNs(targets, existingIPNs);
 
-      final confirmed = await _showConfirmDialog(targets, generated);
+      if (!mounted) return;
+      final confirmed = await _showConfirmDialog(targets, generated, l10n);
       if (!confirmed) return;
 
       setState(() {
@@ -95,7 +99,7 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
         final ipn = generated[part.id]!;
         try {
           await widget.apiService.patchPartIPN(part.id, ipn);
-          results[part.id] = null; // sukces
+          results[part.id] = null;
         } catch (e) {
           results[part.id] = e.toString();
         }
@@ -107,29 +111,31 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✅ Zapisano IPN: $successCount/${targets.length}'),
+            content: Text(AppLocalizations.of(context)!.savedIpnCount(successCount, targets.length)),
             backgroundColor: successCount == targets.length ? Colors.green : Colors.orange,
           ),
         );
       }
 
-      // Odśwież listę po zapisaniu
       await _loadParts();
     } catch (e) {
-      setState(() => _message = '❌ Błąd: $e');
+      if (!mounted) return;
+      setState(() => _message = AppLocalizations.of(context)!.errorGeneric(e.toString()));
     } finally {
-      setState(() {
-        _loading = false;
-        _saving = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _saving = false;
+        });
+      }
     }
   }
 
-  Future<bool> _showConfirmDialog(List<Part> targets, Map<int, String> generated) async {
+  Future<bool> _showConfirmDialog(List<Part> targets, Map<int, String> generated, AppLocalizations l10n) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Potwierdź generowanie IPN'),
+        title: Text(l10n.confirmIpnGenTitle),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView(
@@ -158,11 +164,11 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Anuluj'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Zatwierdź i zapisz'),
+            child: Text(l10n.confirmAndSave),
           ),
         ],
       ),
@@ -172,13 +178,14 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Generator IPN'),
+        title: Text(l10n.ipnGeneratorTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Odśwież listę',
+            tooltip: l10n.refreshListTooltip,
             onPressed: _loading ? null : _loadParts,
           ),
         ],
@@ -186,7 +193,7 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _partsWithoutIpn.isEmpty
-              ? Center(child: Text(_message.isNotEmpty ? _message : 'Brak części bez IPN'))
+              ? Center(child: Text(_message.isNotEmpty ? _message : l10n.noPartsWithoutIpn))
               : Column(
                   children: [
                     Padding(
@@ -194,7 +201,7 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
                       child: Row(
                         children: [
                           Text(
-                            'Części bez IPN: ${_partsWithoutIpn.length}  •  Zaznaczono: ${_selected.length}',
+                            l10n.partsWithoutIpnCount(_partsWithoutIpn.length, _selected.length),
                             style: const TextStyle(color: Colors.grey, fontSize: 13),
                           ),
                           const Spacer(),
@@ -208,8 +215,8 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
                             }),
                             child: Text(
                               _selected.length == _partsWithoutIpn.length
-                                  ? 'Odznacz wszystkie'
-                                  : 'Zaznacz wszystkie',
+                                  ? l10n.deselectAll
+                                  : l10n.selectAll,
                             ),
                           ),
                         ],
@@ -272,8 +279,8 @@ class _IpnGeneratorPageState extends State<IpnGeneratorPage> {
                               : const Icon(Icons.auto_fix_high),
                           label: Text(
                             _selected.isEmpty
-                                ? 'Zaznacz części aby generować IPN'
-                                : 'Generuj IPN dla ${_selected.length} części',
+                                ? l10n.selectPartsToGenerate
+                                : l10n.generateIpnForCount(_selected.length),
                           ),
                           onPressed: (_selected.isEmpty || _saving) ? null : _onGeneratePressed,
                         ),

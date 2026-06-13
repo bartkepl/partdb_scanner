@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../l10n/app_localizations.dart';
 import '../services/api_service.dart';
 import 'barcode_scan_page.dart';
 
@@ -29,6 +30,7 @@ class _ConfigPageState extends State<ConfigPage> {
   String _appVersion = '';
   bool _sunmiEnabled = true;
   bool _niimbotEnabled = true;
+  String _selectedLocale = 'en';
 
   @override
   void initState() {
@@ -40,6 +42,7 @@ class _ConfigPageState extends State<ConfigPage> {
     _selectedZoom = widget.apiService.zoomLevel;
     _sunmiEnabled = widget.apiService.sunmiEnabled;
     _niimbotEnabled = widget.apiService.niimbotEnabled;
+    _selectedLocale = widget.apiService.locale;
   }
 
   Future<void> _loadAppVersion() async {
@@ -65,6 +68,7 @@ class _ConfigPageState extends State<ConfigPage> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _loading = true;
       _status = '';
@@ -79,12 +83,12 @@ class _ConfigPageState extends State<ConfigPage> {
     try {
       final info = await widget.apiService.getCurrentTokenInfo();
       setState(() {
-        _status = '✅ Token OK (user: ${info['user'] ?? 'unknown'})';
+        _status = l10n.configTokenOk(info['user']?.toString() ?? 'unknown');
         _tokenHidden = true;
       });
     } catch (e) {
       setState(() {
-        _status = '⚠️ Token zapisany, ale weryfikacja nie powiodła się: $e';
+        _status = l10n.configTokenSavedButFailed(e.toString());
       });
     } finally {
       setState(() {
@@ -95,16 +99,17 @@ class _ConfigPageState extends State<ConfigPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Konfiguracja Part-DB')),
+      appBar: AppBar(title: Text(l10n.configTitle)),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
             TextField(
               controller: _urlController,
-              decoration: const InputDecoration(
-                labelText: 'Base URL (np. http://192.168.1.10:8000)',
+              decoration: InputDecoration(
+                labelText: l10n.configBaseUrlHint,
               ),
             ),
             Row(
@@ -126,7 +131,7 @@ class _ConfigPageState extends State<ConfigPage> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.qr_code_scanner),
-                  tooltip: 'Skanuj token',
+                  tooltip: l10n.configScanToken,
                   onPressed: _scanToken,
                 ),
               ],
@@ -140,16 +145,16 @@ class _ConfigPageState extends State<ConfigPage> {
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-                  : const Text('Zapisz i sprawdź token'),
+                  : Text(l10n.configSaveAndVerify),
             ),
             const SizedBox(height: 12),
             Text(_status),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Zoom level',
-                  style: TextStyle(fontSize: 16),
+                Text(
+                  l10n.configZoomLevel,
+                  style: const TextStyle(fontSize: 16),
                 ),
                 SizedBox(
                   width: 110,
@@ -174,21 +179,43 @@ class _ConfigPageState extends State<ConfigPage> {
                 ),
               ],
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.configLanguage,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                DropdownButton<String>(
+                  value: _selectedLocale,
+                  items: const [
+                    DropdownMenuItem(value: 'en', child: Text('English')),
+                    DropdownMenuItem(value: 'pl', child: Text('Polski')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _selectedLocale = value);
+                      widget.apiService.saveLocale(value);
+                    }
+                  },
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
             const Divider(),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 4),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Text(
-                  'Drukarki',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  l10n.configPrinters,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
             SwitchListTile(
-              title: const Text('Drukarka Sunmi'),
-              subtitle: const Text('Drukowanie paragonów/etykiet przez Sunmi'),
+              title: Text(l10n.configSunmiTitle),
+              subtitle: Text(l10n.configSunmiSubtitle),
               value: _sunmiEnabled,
               onChanged: (value) {
                 setState(() => _sunmiEnabled = value);
@@ -197,8 +224,8 @@ class _ConfigPageState extends State<ConfigPage> {
               contentPadding: EdgeInsets.zero,
             ),
             SwitchListTile(
-              title: const Text('Drukarka Niimbot'),
-              subtitle: const Text('Drukowanie etykiet przez Niimbot Bluetooth'),
+              title: Text(l10n.configNiimbotTitle),
+              subtitle: Text(l10n.configNiimbotSubtitle),
               value: _niimbotEnabled,
               onChanged: (value) {
                 setState(() => _niimbotEnabled = value);
@@ -208,20 +235,14 @@ class _ConfigPageState extends State<ConfigPage> {
             ),
             const Spacer(),
             const SizedBox(height: 16),
-
-            // 🔹 Dyskretna wersja aplikacji
             if (_appVersion.isNotEmpty)
               Text(
-                'Wersja aplikacji v$_appVersion',
+                l10n.configAppVersion(_appVersion),
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[600],
                 ),
               ),
-
-
-
-
           ],
         ),
       ),

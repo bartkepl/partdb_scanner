@@ -1,0 +1,400 @@
+{
+  "@@locale": "en",
+
+  "navSearch": "Search",
+  "navIpnGenerator": "IPN Generator",
+  "navCategories": "Categories",
+  "navReview": "Review",
+  "navConfig": "Configuration",
+
+  "lowStockBanner": "{count} part(s) have low stock",
+  "@lowStockBanner": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "show": "Show",
+  "dismiss": "Dismiss",
+
+  "cancel": "Cancel",
+  "save": "Save",
+  "refresh": "Refresh",
+  "search": "Search",
+  "scan": "Scan",
+  "print": "Print",
+  "connect": "Connect",
+  "more": "More...",
+  "reset": "Reset",
+  "assign": "Assign",
+  "selectAll": "Select all",
+  "deselectAll": "Deselect all",
+  "commentOptional": "Comment (optional)",
+  "commentHint": "e.g. TME delivery, usage for project...",
+  "saveChanges": "Save changes",
+  "confirmAndSave": "Confirm & save",
+  "tryAgain": "Try again",
+  "none": "— none —",
+  "filterAll": "All",
+  "location": "Location",
+  "quantity": "Quantity",
+
+  "configTitle": "Part-DB Configuration",
+  "configBaseUrlHint": "Base URL (e.g. http://192.168.1.10:8000)",
+  "configScanToken": "Scan token",
+  "configSaveAndVerify": "Save & verify token",
+  "configTokenOk": "✅ Token OK (user: {user})",
+  "@configTokenOk": {
+    "placeholders": {
+      "user": { "type": "String" }
+    }
+  },
+  "configTokenSavedButFailed": "⚠️ Token saved, but verification failed: {error}",
+  "@configTokenSavedButFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "configZoomLevel": "Zoom level",
+  "configPrinters": "Printers",
+  "configSunmiTitle": "Sunmi Printer",
+  "configSunmiSubtitle": "Print receipts/labels via Sunmi",
+  "configNiimbotTitle": "Niimbot Printer",
+  "configNiimbotSubtitle": "Print labels via Niimbot Bluetooth",
+  "configAppVersion": "App version v{version}",
+  "@configAppVersion": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
+  "configLanguage": "Language",
+
+  "searchTitle": "Search part",
+  "searchHint": "Enter IPN, name, parameter...",
+  "searching": "🔎 Searching...",
+  "searchNoResults": "No results for \"{query}\"",
+  "@searchNoResults": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
+  "searchFound": "Found: {count}",
+  "@searchFound": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "searchOnlyLowStock": "Low stock only",
+  "searchSortFilter": "Sort / filter",
+  "searchExportCsv": "Export CSV",
+  "searchExportError": "Export error: {error}",
+  "@searchExportError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "searchInventory": "Stock taking",
+  "searchOrScan": "Search or scan a part",
+  "recentlyViewed": "Recently viewed",
+  "sortSectionTitle": "Sorting",
+  "sortNone": "None",
+  "sortNameAsc": "Name A-Z",
+  "sortNameDesc": "Name Z-A",
+  "sortStockAsc": "Stock ↑",
+  "sortStockDesc": "Stock ↓",
+  "categoryLabel": "Category",
+  "resetFilters": "Reset filters",
+  "noLowStockParts": "No low stock parts",
+  "savedQty": "✅ {name}: {qty} pcs.",
+  "@savedQty": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "qty": { "type": "int" }
+    }
+  },
+  "errorGeneric": "❌ Error: {error}",
+  "@errorGeneric": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "addPhoto": "Add photo",
+  "cameraSource": "Camera",
+  "gallerySource": "Gallery",
+  "photoAdded": "Photo added to PartDB",
+  "uploadError": "Upload error: {error}",
+  "@uploadError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "dataRefreshed": "Data refreshed",
+  "refreshError": "Refresh error: {error}",
+  "@refreshError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "fetchParamsError": "Could not fetch parameters",
+  "savedLot": "Saved: {location} = {qty}",
+  "@savedLot": {
+    "placeholders": {
+      "location": { "type": "String" },
+      "qty": { "type": "int" }
+    }
+  },
+  "printSunmi": "Print (Sunmi)",
+  "niimbotLabels": "Niimbot Labels",
+  "printed": "Printed",
+  "printError": "Print error: {error}",
+  "@printError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "categoryText": "Category: {category}",
+  "@categoryText": {
+    "placeholders": {
+      "category": { "type": "String" }
+    }
+  },
+  "manufacturerText": "Manufacturer: {manufacturer}",
+  "@manufacturerText": {
+    "placeholders": {
+      "manufacturer": { "type": "String" }
+    }
+  },
+  "tagsText": "Tags: {tags}",
+  "@tagsText": {
+    "placeholders": {
+      "tags": { "type": "String" }
+    }
+  },
+  "noteText": "Note: {note}",
+  "@noteText": {
+    "placeholders": {
+      "note": { "type": "String" }
+    }
+  },
+  "parametersLabel": "Parameters:",
+  "paramUpdated": "Updated: {name}",
+  "@paramUpdated": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "saveError": "Save error: {error}",
+  "@saveError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "labelsFor": "Labels: {name}",
+  "@labelsFor": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "labelTypeSection": "Label type",
+  "labelDrawer": "Drawer 22×14mm",
+  "labelDrawerSub": "Name + DataMatrix",
+  "labelSpoolParam": "Spool – params 12×40mm",
+  "labelSpoolParamSub": "Text + DataMatrix",
+  "labelSpoolBarcode": "Spool – barcode 12×40mm",
+  "labelSpoolBarcodeSub": "Code128 barcode",
+  "drawerLabelConfig": "Drawer label configuration",
+  "nameFontSize": "Name text size:",
+  "spoolLabelParams": "Parameters on spool label",
+  "connecting": "Connecting to printer...",
+  "connected": "✅ Connected",
+  "connectionError": "❌ Connection error: {error}",
+  "@connectionError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "disconnected": "Disconnected",
+  "selectLabelTypeWarning": "⚠️ Select at least one label type",
+  "printing": "Printing...",
+  "printingDrawerLabel": "Printing drawer label...",
+  "printingSpoolLabels": "Printing spool labels...",
+  "printingParamLabel": "Printing parameter label...",
+  "printingBarcodeLabel": "Printing barcode label...",
+  "printDone": "✅ Printed",
+  "disconnectPrinter": "Disconnect printer",
+  "connectPrinter": "Connect to printer",
+
+  "stockTakingTitle": "Stock taking",
+  "saveCorrectionsTooltip": "Save corrections",
+  "scanNextPart": "Scan next part",
+  "scanIpnOrName": "Scan IPN or part name",
+  "notFound": "Not found: {raw}",
+  "@notFound": {
+    "placeholders": {
+      "raw": { "type": "String" }
+    }
+  },
+  "noStorageLocations": "{name}: no storage locations",
+  "@noStorageLocations": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "alreadyOnList": "{name} already on list ({location})",
+  "@alreadyOnList": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "location": { "type": "String" }
+    }
+  },
+  "noDiscrepancies": "No discrepancies to save",
+  "saveCorrectionsTitle": "Save corrections?",
+  "willUpdatePositions": "Will update {count} item(s).",
+  "@willUpdatePositions": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "savedWithErrors": "Saved: {ok}, errors: {fail}",
+  "@savedWithErrors": {
+    "placeholders": {
+      "ok": { "type": "int" },
+      "fail": { "type": "int" }
+    }
+  },
+  "chooseLocation": "Choose location: {name}",
+  "@chooseLocation": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "stockAmount": "Stock: {amount}",
+  "@stockAmount": {
+    "placeholders": {
+      "amount": { "type": "int" }
+    }
+  },
+
+  "reviewTitle": "Review ({count})",
+  "@reviewTitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reviewTitleEmpty": "Parts review",
+  "noPartsToReview": "No parts to review",
+  "noPartsWithoutIpnSelected": "No selected parts without IPN",
+  "generatedIpnCount": "Generated IPN for {count} parts",
+  "@generatedIpnCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "generateIpnError": "IPN generation error: {error}",
+  "@generateIpnError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "selectParts": "Select parts",
+  "assignLocationTitle": "Assign location",
+  "noReadyParts": "No ready parts (IPN + location required)",
+  "confirmErrors": "Errors: {errors}",
+  "@confirmErrors": {
+    "placeholders": {
+      "errors": { "type": "String" }
+    }
+  },
+  "confirmedPartsCount": "Confirmed {count} parts",
+  "@confirmedPartsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "selectLabelType": "Select label type",
+  "printedLabelsCount": "Printed {count} labels",
+  "@printedLabelsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "drawerLabel": "Drawer",
+  "spoolLabel": "Spool",
+  "generateIpnBtn": "Generate IPN",
+  "locationLabel": "Location",
+  "chooseDots": "Choose…",
+  "confirmedBanner": "Confirmed: {count} parts",
+  "@confirmedBanner": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "printerConnected": "Connected",
+  "noPrinter": "No printer",
+  "printLabelsCount": "Print {count} labels",
+  "@printLabelsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "confirmReady": "Confirm ({count})",
+  "@confirmReady": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "confirmSelected": "Confirm selected",
+
+  "ipnGeneratorTitle": "IPN Generator",
+  "allPartsHaveIpn": "All parts already have IPN.",
+  "noPartsWithoutIpn": "No parts without IPN",
+  "partsWithoutIpnCount": "Parts without IPN: {count}  •  Selected: {selected}",
+  "@partsWithoutIpnCount": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "selected": { "type": "int" }
+    }
+  },
+  "refreshListTooltip": "Refresh list",
+  "confirmIpnGenTitle": "Confirm IPN generation",
+  "selectPartsToGenerate": "Select parts to generate IPN",
+  "generateIpnForCount": "Generate IPN for {count} parts",
+  "@generateIpnForCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "savedIpnCount": "✅ Saved IPN: {saved}/{total}",
+  "@savedIpnCount": {
+    "placeholders": {
+      "saved": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "fetchError": "❌ Fetch error: {error}",
+  "@fetchError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "categoriesTitle": "Categories",
+  "noCategories": "No categories",
+  "noPartsInCategory": "No parts in this category",
+  "errorText": "Error: {error}",
+  "@errorText": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "scanTitle": "Scan code",
+  "selectCodeType": "Select code type",
+  "scanMode": "Mode: {mode}",
+  "@scanMode": {
+    "placeholders": {
+      "mode": { "type": "String" }
+    }
+  }
+}

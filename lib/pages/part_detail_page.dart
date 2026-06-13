@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../l10n/app_localizations.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
 import '../services/history_service.dart';
@@ -83,23 +84,24 @@ class _PartDetailPageState extends State<PartDetailPage> {
   }
 
   Future<void> _addPhoto() async {
+    final l10n = AppLocalizations.of(context)!;
     final picker = ImagePicker();
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Dodaj zdjęcie'),
+        title: Text(l10n.addPhoto),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, ImageSource.camera),
-            child: const Text('Aparat'),
+            child: Text(l10n.cameraSource),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
-            child: const Text('Galeria'),
+            child: Text(l10n.gallerySource),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Anuluj'),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -115,16 +117,17 @@ class _PartDetailPageState extends State<PartDetailPage> {
       final filename = '${_part.name.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.jpg';
       await widget.apiService.uploadAttachment(_part.id, bytes, filename);
       if (!mounted) return;
-      _showToast('Zdjęcie dodane do PartDB');
+      _showToast(l10n.photoAdded);
     } catch (e) {
       if (!mounted) return;
-      _showToast('Błąd wysyłania: $e', isError: true);
+      _showToast(l10n.uploadError(e.toString()), isError: true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
 
   Future<void> _refreshData() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _refreshing = true);
 
     try {
@@ -136,11 +139,13 @@ class _PartDetailPageState extends State<PartDetailPage> {
       });
 
       await _loadParameters();
-      _showToast('Dane odświeżone');
+      if (!mounted) return;
+      _showToast(l10n.dataRefreshed);
     } catch (e) {
-      _showToast('Błąd odświeżania: $e', isError: true);
+      if (!mounted) return;
+      _showToast(l10n.refreshError(e.toString()), isError: true);
     } finally {
-      setState(() => _refreshing = false);
+      if (mounted) setState(() => _refreshing = false);
     }
   }
 
@@ -156,11 +161,12 @@ class _PartDetailPageState extends State<PartDetailPage> {
         if (details.manufacturer.isNotEmpty) _part.manufacturer = details.manufacturer;
       });
     } catch (e) {
-      _showToast('Nie udało się pobrać parametrów', isError: true);
+      _showToast(AppLocalizations.of(context)!.fetchParamsError, isError: true);
     }
   }
 
   Future<void> _saveLot(PartLot lot) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _saving = true);
 
     try {
@@ -183,9 +189,9 @@ class _PartDetailPageState extends State<PartDetailPage> {
         commentCtrl?.clear();
       });
 
-      _showToast('Zapisano: ${lot.locationName} = ${lot.amount.toInt()}');
+      _showToast(l10n.savedLot(lot.locationName, lot.amount.toInt()));
     } catch (e) {
-      _showToast('Błąd: $e', isError: true);
+      _showToast(l10n.errorGeneric(e.toString()), isError: true);
     } finally {
       setState(() => _saving = false);
     }
@@ -252,6 +258,7 @@ class _PartDetailPageState extends State<PartDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final part = _part;
     final sortedParams = _sortedParameters(
         part.parameters
@@ -279,20 +286,23 @@ class _PartDetailPageState extends State<PartDetailPage> {
               MenuItemButton(
                 leadingIcon: const Icon(Icons.refresh),
                 onPressed: _refreshing ? null : _refreshData,
-                child: const Text('Odśwież'),
+                child: Text(l10n.refresh),
               ),
               if (widget.apiService.sunmiEnabled)
                 MenuItemButton(
                   leadingIcon: const Icon(Icons.print),
                   onPressed: () async {
+                    final loc = AppLocalizations.of(context)!;
                     try {
                       await PrinterService.printPart(_part);
-                      _showToast('Wydrukowano');
+                      if (!mounted) return;
+                      _showToast(loc.printed);
                     } catch (e) {
-                      _showToast('Błąd drukowania: $e', isError: true);
+                      if (!mounted) return;
+                      _showToast(loc.printError(e.toString()), isError: true);
                     }
                   },
-                  child: const Text('Drukuj (Sunmi)'),
+                  child: Text(l10n.printSunmi),
                 ),
               if (widget.apiService.niimbotEnabled)
                 MenuItemButton(
@@ -303,12 +313,12 @@ class _PartDetailPageState extends State<PartDetailPage> {
                       builder: (_) => LabelPrintPage(part: _part),
                     ),
                   ),
-                  child: const Text('Etykiety Niimbot'),
+                  child: Text(l10n.niimbotLabels),
                 ),
               MenuItemButton(
                 leadingIcon: const Icon(Icons.add_a_photo),
                 onPressed: _saving ? null : _addPhoto,
-                child: const Text('Dodaj zdjęcie'),
+                child: Text(l10n.addPhoto),
               ),
             ],
           ),
@@ -321,13 +331,13 @@ class _PartDetailPageState extends State<PartDetailPage> {
             Text('ID: ${part.id}'),
             if (part.partNumber.isNotEmpty) Text('IPN: ${part.partNumber}'),
             if (part.category.isNotEmpty)
-              Text('Kategoria: ${part.category}',
+              Text(l10n.categoryText(part.category),
                   style: const TextStyle(color: Colors.grey)),
             if (part.manufacturer.isNotEmpty)
-              Text('Producent: ${part.manufacturer}',
+              Text(l10n.manufacturerText(part.manufacturer),
                   style: const TextStyle(color: Colors.grey)),
             if (part.tags.isNotEmpty)
-              Text('Tagi: ${part.tags}',
+              Text(l10n.tagsText(part.tags),
                   style: const TextStyle(color: Colors.grey, fontSize: 12)),
             if (part.description.isNotEmpty) ...[
               const SizedBox(height: 4),
@@ -336,7 +346,7 @@ class _PartDetailPageState extends State<PartDetailPage> {
             ],
             if (part.comment.isNotEmpty) ...[
               const SizedBox(height: 4),
-              Text('Notatka: ${part.comment}',
+              Text(l10n.noteText(part.comment),
                   style: const TextStyle(color: Colors.amber, fontSize: 12)),
             ],
             const Divider(),
@@ -372,16 +382,16 @@ class _PartDetailPageState extends State<PartDetailPage> {
                       ),
                       TextField(
                         controller: commentCtrl,
-                        decoration: const InputDecoration(
-                          labelText: 'Komentarz (opcjonalnie)',
-                          hintText: 'np. Dostawa TME, zużycie...',
+                        decoration: InputDecoration(
+                          labelText: l10n.commentOptional,
+                          hintText: l10n.commentHint,
                           isDense: true,
                         ),
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton(
                         onPressed: _saving ? null : () => _saveLot(lot),
-                        child: const Text('Zapisz zmiany'),
+                        child: Text(l10n.saveChanges),
                       ),
                     ],
                   ),
@@ -392,8 +402,8 @@ class _PartDetailPageState extends State<PartDetailPage> {
             const Divider(),
             const SizedBox(height: 12),
 
-            const Text('Parametry:',
-                style: TextStyle(
+            Text(l10n.parametersLabel,
+                style: const TextStyle(
                     fontSize: 18, fontWeight: FontWeight.bold)),
 
             ...sortedParams.map((param) {
@@ -407,9 +417,9 @@ class _PartDetailPageState extends State<PartDetailPage> {
                       try {
                         await widget.apiService.patchPartParameter(param.id, v);
                         setState(() => param.value = v);
-                        _showToast('Zaktualizowano: ${param.name}');
+                        _showToast(l10n.paramUpdated(param.name));
                       } catch (e) {
-                        _showToast('Błąd zapisu: $e', isError: true);
+                        _showToast(l10n.saveError(e.toString()), isError: true);
                       }
                     },
                   ),

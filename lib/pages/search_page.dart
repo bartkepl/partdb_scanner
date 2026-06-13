@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
 import '../services/history_service.dart';
@@ -24,8 +25,8 @@ class _SearchPageState extends State<SearchPage> {
   String _message = '';
   String _searchType = 'auto';
   bool _showOnlyLowStock = false;
-  String _sortBy = 'none'; // 'none' | 'name_asc' | 'name_desc' | 'stock_asc' | 'stock_desc'
-  String _filterCategory = ''; // '' = wszystkie
+  String _sortBy = 'none';
+  String _filterCategory = '';
 
   @override
   void initState() {
@@ -39,13 +40,14 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _search() async {
+    final l10n = AppLocalizations.of(context)!;
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
 
     setState(() {
       _loading = true;
       _results = [];
-      _message = '🔎 Szukam...';
+      _message = l10n.searching;
     });
 
     try {
@@ -55,7 +57,6 @@ class _SearchPageState extends State<SearchPage> {
         found.add(await widget.apiService.findPartByIPN(query));
       } else if (_searchType == 'name') {
         found = await widget.apiService.searchByName(query);
-        // fallback: serwer może robić exact match — wtedy szukaj lokalnie
         if (found.isEmpty && query.length >= 2) {
           found = await widget.apiService.searchPartsAdvanced(
             query,
@@ -76,7 +77,6 @@ class _SearchPageState extends State<SearchPage> {
           searchInValues: true,
         );
       } else {
-        // auto: najpierw server-side po nazwie/IPN, potem lokalne param/value
         found = await widget.apiService.searchByName(query);
         if (found.isEmpty) {
           found = await widget.apiService.searchPartsAdvanced(query);
@@ -86,11 +86,11 @@ class _SearchPageState extends State<SearchPage> {
       setState(() {
         _results = found;
         _message = found.isEmpty
-            ? 'Brak wyników dla "$query"'
-            : 'Znaleziono: ${found.length}';
+            ? l10n.searchNoResults(query)
+            : l10n.searchFound(found.length);
       });
     } catch (e) {
-      setState(() => _message = '❌ Błąd: $e');
+      setState(() => _message = l10n.errorGeneric(e.toString()));
     } finally {
       setState(() => _loading = false);
     }
@@ -108,7 +108,6 @@ class _SearchPageState extends State<SearchPage> {
 
     setState(() => _searchController.text = result);
 
-    // 7-cyfrowy IPN → szybki bottom sheet
     if (RegExp(r'^\d{7}$').hasMatch(result)) {
       setState(() => _loading = true);
       try {
@@ -132,12 +131,12 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
-    // Dla jednego lotu — bezpośrednio bottom sheet; wiele lotów — pełny widok
     if (part.partLots.length > 1) {
       _openPart(part);
       return;
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final lot = part.partLots.first;
     int current = lot.amount.toInt();
     final commentController = TextEditingController();
@@ -185,9 +184,9 @@ class _SearchPageState extends State<SearchPage> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: commentController,
-                    decoration: const InputDecoration(
-                      labelText: 'Komentarz (opcjonalnie)',
-                      hintText: 'np. Dostawa TME, zużycie do projektu...',
+                    decoration: InputDecoration(
+                      labelText: l10n.commentOptional,
+                      hintText: l10n.commentHint,
                       isDense: true,
                     ),
                   ),
@@ -197,7 +196,7 @@ class _SearchPageState extends State<SearchPage> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Anuluj'),
+                          child: Text(l10n.cancel),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -215,7 +214,7 @@ class _SearchPageState extends State<SearchPage> {
                               if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('✅ ${part.name}: $current szt.'),
+                                  content: Text(l10n.savedQty(part.name, current)),
                                   backgroundColor: Colors.green,
                                   duration: const Duration(seconds: 2),
                                 ),
@@ -224,13 +223,13 @@ class _SearchPageState extends State<SearchPage> {
                               if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('❌ Błąd: $e'),
+                                  content: Text(l10n.errorGeneric(e.toString())),
                                   backgroundColor: Colors.red,
                                 ),
                               );
                             }
                           },
-                          child: const Text('Zapisz'),
+                          child: Text(l10n.save),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -239,7 +238,7 @@ class _SearchPageState extends State<SearchPage> {
                           Navigator.pop(ctx);
                           _openPart(part);
                         },
-                        child: const Text('Więcej...'),
+                        child: Text(l10n.more),
                       ),
                     ],
                   ),
@@ -263,6 +262,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _openFromHistory(HistoryEntry entry) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _loading = true;
       _message = '';
@@ -272,7 +272,7 @@ class _SearchPageState extends State<SearchPage> {
       if (!mounted) return;
       _openPart(part);
     } catch (e) {
-      setState(() => _message = '❌ Błąd: $e');
+      setState(() => _message = l10n.errorGeneric(e.toString()));
     } finally {
       setState(() => _loading = false);
     }
@@ -280,11 +280,12 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final showHistory = _results.isEmpty && !_loading && _searchController.text.isEmpty;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wyszukaj część'),
+        title: Text(l10n.searchTitle),
         actions: [
           if (_results.isNotEmpty) ...[
             IconButton(
@@ -292,7 +293,7 @@ class _SearchPageState extends State<SearchPage> {
                 Icons.warning_amber,
                 color: _showOnlyLowStock ? Colors.orange : Colors.white54,
               ),
-              tooltip: 'Tylko niski stan',
+              tooltip: l10n.searchOnlyLowStock,
               onPressed: () => setState(() => _showOnlyLowStock = !_showOnlyLowStock),
             ),
             IconButton(
@@ -302,19 +303,19 @@ class _SearchPageState extends State<SearchPage> {
                     ? Colors.orange
                     : Colors.white,
               ),
-              tooltip: 'Sortuj / filtruj',
+              tooltip: l10n.searchSortFilter,
               onPressed: _showSortFilter,
             ),
             IconButton(
               icon: const Icon(Icons.download),
-              tooltip: 'Eksport CSV',
+              tooltip: l10n.searchExportCsv,
               onPressed: () async {
                 final messenger = ScaffoldMessenger.of(context);
                 try {
                   await ExportService.exportAndShare(_results);
                 } catch (e) {
                   messenger.showSnackBar(
-                    SnackBar(content: Text('Błąd eksportu: $e'), backgroundColor: Colors.red),
+                    SnackBar(content: Text(l10n.searchExportError(e.toString())), backgroundColor: Colors.red),
                   );
                 }
               },
@@ -322,7 +323,7 @@ class _SearchPageState extends State<SearchPage> {
           ],
           IconButton(
             icon: const Icon(Icons.inventory_2_outlined),
-            tooltip: 'Inwentaryzacja',
+            tooltip: l10n.searchInventory,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -333,12 +334,12 @@ class _SearchPageState extends State<SearchPage> {
           PopupMenuButton<String>(
             initialValue: _searchType,
             onSelected: (v) => setState(() => _searchType = v),
-            itemBuilder: (ctx) => const [
-              PopupMenuItem(value: 'auto', child: Text('Auto')),
-              PopupMenuItem(value: 'ipn', child: Text('Tylko IPN')),
-              PopupMenuItem(value: 'name', child: Text('Tylko nazwa')),
-              PopupMenuItem(value: 'param', child: Text('Po parametrach')),
-              PopupMenuItem(value: 'value', child: Text('Po wartościach')),
+            itemBuilder: (ctx) => [
+              PopupMenuItem(value: 'auto', child: Text(l10n.filterAll)),
+              const PopupMenuItem(value: 'ipn', child: Text('IPN')),
+              const PopupMenuItem(value: 'name', child: Text('Name')),
+              const PopupMenuItem(value: 'param', child: Text('Parameter')),
+              const PopupMenuItem(value: 'value', child: Text('Value')),
             ],
           ),
         ],
@@ -349,8 +350,8 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             TextField(
               controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: 'Wpisz fragment IPN, nazwy, parametru...',
+              decoration: InputDecoration(
+                labelText: l10n.searchHint,
               ),
               onChanged: (v) {
                 if (v.isEmpty) setState(() => _results = []);
@@ -363,7 +364,7 @@ class _SearchPageState extends State<SearchPage> {
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.search),
-                    label: const Text('Szukaj'),
+                    label: Text(l10n.search),
                     onPressed: _search,
                   ),
                 ),
@@ -371,7 +372,7 @@ class _SearchPageState extends State<SearchPage> {
                 Expanded(
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.qr_code_scanner),
-                    label: const Text('Skanuj'),
+                    label: Text(l10n.scan),
                     onPressed: _scanBarcode,
                   ),
                 ),
@@ -393,16 +394,17 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildHistory() {
+    final l10n = AppLocalizations.of(context)!;
     if (_history.isEmpty) {
-      return const Center(child: Text('Wyszukaj lub zeskanuj część'));
+      return Center(child: Text(l10n.searchOrScan));
     }
     return ListView(
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
-            'Ostatnio oglądane',
-            style: TextStyle(fontSize: 13, color: Colors.grey),
+            l10n.recentlyViewed,
+            style: const TextStyle(fontSize: 13, color: Colors.grey),
           ),
         ),
         ..._history.map(
@@ -419,6 +421,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _showSortFilter() async {
+    final l10n = AppLocalizations.of(context)!;
     final categories = _results.map((p) => p.category).where((c) => c.isNotEmpty).toSet().toList()..sort();
 
     await showModalBottomSheet(
@@ -430,16 +433,16 @@ class _SearchPageState extends State<SearchPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Sortowanie', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(l10n.sortSectionTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
               Wrap(
                 spacing: 8,
                 children: [
-                  for (final opt in const [
-                    ('none', 'Brak'),
-                    ('name_asc', 'Nazwa A-Z'),
-                    ('name_desc', 'Nazwa Z-A'),
-                    ('stock_asc', 'Stan ↑'),
-                    ('stock_desc', 'Stan ↓'),
+                  for (final opt in [
+                    ('none', l10n.sortNone),
+                    ('name_asc', l10n.sortNameAsc),
+                    ('name_desc', l10n.sortNameDesc),
+                    ('stock_asc', l10n.sortStockAsc),
+                    ('stock_desc', l10n.sortStockDesc),
                   ])
                     ChoiceChip(
                       label: Text(opt.$2),
@@ -450,12 +453,12 @@ class _SearchPageState extends State<SearchPage> {
               ),
               if (categories.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text('Kategoria', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(l10n.categoryLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
                 Wrap(
                   spacing: 8,
                   children: [
                     ChoiceChip(
-                      label: const Text('Wszystkie'),
+                      label: Text(l10n.filterAll),
                       selected: _filterCategory.isEmpty,
                       onSelected: (_) => setState(() { _filterCategory = ''; setSheet(() {}); }),
                     ),
@@ -474,7 +477,7 @@ class _SearchPageState extends State<SearchPage> {
                   setState(() { _sortBy = 'none'; _filterCategory = ''; });
                   Navigator.pop(ctx);
                 },
-                child: const Text('Resetuj filtry'),
+                child: Text(l10n.resetFilters),
               ),
             ],
           ),
@@ -484,6 +487,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildResults() {
+    final l10n = AppLocalizations.of(context)!;
     var displayed = _showOnlyLowStock
         ? _results.where((p) => p.isLowStock).toList()
         : List<Part>.from(_results);
@@ -504,7 +508,7 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     if (displayed.isEmpty) {
-      return const Center(child: Text('Brak części z niskim stanem'));
+      return Center(child: Text(l10n.noLowStockParts));
     }
 
     return ListView.builder(
@@ -513,7 +517,7 @@ class _SearchPageState extends State<SearchPage> {
         final p = displayed[i];
         final sub = [
           if (p.partNumber.isNotEmpty) 'IPN: ${p.partNumber}',
-          'Stan: ${p.totalStock}',
+          'Stock: ${p.totalStock}',
           if (p.category.isNotEmpty) p.category,
           if (p.manufacturer.isNotEmpty) p.manufacturer,
         ].join(' • ');

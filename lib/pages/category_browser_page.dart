@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
 import 'part_detail_page.dart';
@@ -58,7 +59,6 @@ class _CategoryBrowserPageState extends State<CategoryBrowserPage> {
       }
     }
 
-    // Sortuj alfabetycznie na każdym poziomie
     void sortNodes(List<_CategoryNode> nodes) {
       nodes.sort((a, b) => a.category.name.compareTo(b.category.name));
       for (final n in nodes) { sortNodes(n.children); }
@@ -91,9 +91,10 @@ class _CategoryBrowserPageState extends State<CategoryBrowserPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kategorie'),
+        title: Text(l10n.categoriesTitle),
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
         ],
@@ -101,9 +102,9 @@ class _CategoryBrowserPageState extends State<CategoryBrowserPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
-              ? Center(child: Text('Błąd: $_error'))
+              ? Center(child: Text(l10n.errorText(_error)))
               : _roots.isEmpty
-                  ? const Center(child: Text('Brak kategorii'))
+                  ? Center(child: Text(l10n.noCategories))
                   : ListView(
                       children: _roots
                           .map((n) => _CategoryTile(
@@ -141,7 +142,6 @@ class _CategoryTile extends StatelessWidget {
       children: [
         Row(
           children: [
-            // Przycisk +/- (expand/collapse) — osobny obszar kliknięcia
             SizedBox(
               width: 28 + 12 + indent,
               child: hasChildren
@@ -158,7 +158,6 @@ class _CategoryTile extends StatelessWidget {
                     )
                   : SizedBox(width: 12 + indent + 28),
             ),
-            // Nazwa kategorii — osobny obszar kliknięcia, otwiera listę części
             Expanded(
               child: InkWell(
                 onTap: () => onOpenParts(node),
@@ -197,8 +196,6 @@ class _CategoryTile extends StatelessWidget {
     );
   }
 }
-
-// ─── Lista części dla wybranej kategorii ─────────────────────────────────────
 
 class _CategoryPartsPage extends StatefulWidget {
   final ApiService apiService;
@@ -239,6 +236,7 @@ class _CategoryPartsPageState extends State<_CategoryPartsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.categoryTitle),
@@ -249,9 +247,9 @@ class _CategoryPartsPageState extends State<_CategoryPartsPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
-              ? Center(child: Text('Błąd: $_error'))
+              ? Center(child: Text(l10n.errorText(_error)))
               : _parts.isEmpty
-                  ? const Center(child: Text('Brak części w tej kategorii'))
+                  ? Center(child: Text(l10n.noPartsInCategory))
                   : ListView.builder(
                       itemCount: _parts.length,
                       itemBuilder: (ctx, i) {
@@ -264,7 +262,7 @@ class _CategoryPartsPageState extends State<_CategoryPartsPage> {
                           title: Text(p.name),
                           subtitle: Text([
                             if (p.partNumber.isNotEmpty) 'IPN: ${p.partNumber}',
-                            'Stan: ${p.totalStock}',
+                            'Stock: ${p.totalStock}',
                             if (p.manufacturer.isNotEmpty) p.manufacturer,
                           ].join(' • ')),
                           trailing: p.isLowStock

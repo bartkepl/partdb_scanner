@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/label_config.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
@@ -43,12 +44,8 @@ class _ReviewPageState extends State<ReviewPage> {
 
   @override
   void dispose() {
-    for (final c in _ipnControllers.values) {
-      c.dispose();
-    }
-    for (final c in _amountControllers.values) {
-      c.dispose();
-    }
+    for (final c in _ipnControllers.values) { c.dispose(); }
+    for (final c in _amountControllers.values) { c.dispose(); }
     super.dispose();
   }
 
@@ -65,12 +62,8 @@ class _ReviewPageState extends State<ReviewPage> {
       final parts = results[0] as List<Part>;
       final locations = results[1] as List<StorageLocation>;
 
-      for (final c in _ipnControllers.values) {
-        c.dispose();
-      }
-      for (final c in _amountControllers.values) {
-        c.dispose();
-      }
+      for (final c in _ipnControllers.values) { c.dispose(); }
+      for (final c in _amountControllers.values) { c.dispose(); }
       _ipnControllers.clear();
       _amountControllers.clear();
       _locationDraft.clear();
@@ -108,15 +101,14 @@ class _ReviewPageState extends State<ReviewPage> {
     return ipn.isNotEmpty && loc != null;
   }
 
-  // ─── Generowanie IPN ────────────────────────────────────────────────────
-
   Future<void> _generateIpns() async {
+    final l10n = AppLocalizations.of(context)!;
     final targets = _parts
         .where((p) => _selected.contains(p.id) && (_ipnControllers[p.id]?.text.trim().isEmpty ?? true))
         .toList();
 
     if (targets.isEmpty) {
-      _showSnack('Brak zaznaczonych części bez IPN', isError: true);
+      _showSnack(l10n.noPartsWithoutIpnSelected, isError: true);
       return;
     }
 
@@ -129,9 +121,11 @@ class _ReviewPageState extends State<ReviewPage> {
         _ipnControllers[entry.key]?.text = entry.value;
       }
       setState(() {});
-      _showSnack('Wygenerowano IPN dla ${generated.length} części');
+      if (!mounted) return;
+      _showSnack(AppLocalizations.of(context)!.generatedIpnCount(generated.length));
     } catch (e) {
-      _showSnack('Błąd generowania IPN: $e', isError: true);
+      if (!mounted) return;
+      _showSnack(AppLocalizations.of(context)!.generateIpnError(e.toString()), isError: true);
     } finally {
       setState(() => _loading = false);
     }
@@ -154,11 +148,10 @@ class _ReviewPageState extends State<ReviewPage> {
     return result;
   }
 
-  // ─── Przypisanie lokalizacji ─────────────────────────────────────────────
-
   Future<void> _assignLocation() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_selected.isEmpty) {
-      _showSnack('Zaznacz części', isError: true);
+      _showSnack(l10n.selectParts, isError: true);
       return;
     }
     if (_locations.isEmpty) return;
@@ -168,7 +161,7 @@ class _ReviewPageState extends State<ReviewPage> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setS) => AlertDialog(
-          title: const Text('Przypisz lokalizację'),
+          title: Text(l10n.assignLocationTitle),
           content: DropdownButton<StorageLocation>(
             isExpanded: true,
             value: chosen,
@@ -178,8 +171,8 @@ class _ReviewPageState extends State<ReviewPage> {
             onChanged: (v) => setS(() => chosen = v),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Anuluj')),
-            ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Przypisz')),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+            ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.assign)),
           ],
         ),
       ),
@@ -194,12 +187,11 @@ class _ReviewPageState extends State<ReviewPage> {
     }
   }
 
-  // ─── Zatwierdzanie ───────────────────────────────────────────────────────
-
   Future<void> _confirmSelected() async {
+    final l10n = AppLocalizations.of(context)!;
     final toConfirm = _parts.where((p) => _selected.contains(p.id) && _isReady(p)).toList();
     if (toConfirm.isEmpty) {
-      _showSnack('Brak gotowych części (wymagane IPN + lokalizacja)', isError: true);
+      _showSnack(l10n.noReadyParts, isError: true);
       return;
     }
 
@@ -213,12 +205,10 @@ class _ReviewPageState extends State<ReviewPage> {
         final amount = double.tryParse(_amountControllers[part.id]?.text ?? '1') ?? 1.0;
         final locationIri = '/api/storage_locations/${location.id}';
 
-        // 1. PATCH IPN
         if (ipn != part.partNumber) {
           await _api.patchPartIPN(part.id, ipn);
         }
 
-        // 2. Lot: utwórz lub zaktualizuj
         if (part.partLots.isEmpty) {
           await _api.createPartLot(part.id, amount, locationIri);
         } else {
@@ -229,10 +219,7 @@ class _ReviewPageState extends State<ReviewPage> {
           }
         }
 
-        // 3. Kasuj flagę needs_review
         await _api.patchPartNeedsReview(part.id, false);
-
-        // 4. Re-fetch aktualnych danych do druku
         final fresh = await _api.fetchPartById(part.id);
 
         setState(() {
@@ -247,18 +234,18 @@ class _ReviewPageState extends State<ReviewPage> {
 
     setState(() => _confirming = false);
 
+    if (!mounted) return;
     if (errors.isNotEmpty) {
-      _showSnack('Błędy: ${errors.join('; ')}', isError: true);
+      _showSnack(l10n.confirmErrors(errors.join('; ')), isError: true);
     } else {
-      _showSnack('Zatwierdzono ${toConfirm.length} części');
+      _showSnack(l10n.confirmedPartsCount(toConfirm.length));
     }
   }
 
-  // ─── Drukowanie ──────────────────────────────────────────────────────────
-
   Future<void> _printConfirmed() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_labelType == null) {
-      _showSnack('Wybierz typ etykiety', isError: true);
+      _showSnack(l10n.selectLabelType, isError: true);
       return;
     }
     if (_confirmedParts.isEmpty) return;
@@ -292,11 +279,13 @@ class _ReviewPageState extends State<ReviewPage> {
         }
       }
 
-      _showSnack('Wydrukowano ${_confirmedParts.length} etykiet');
+      if (!mounted) return;
+      _showSnack(l10n.printedLabelsCount(_confirmedParts.length));
     } catch (e) {
-      _showSnack('Błąd drukowania: $e', isError: true);
+      if (!mounted) return;
+      _showSnack(l10n.printError(e.toString()), isError: true);
     } finally {
-      setState(() => _printing = false);
+      if (mounted) setState(() => _printing = false);
     }
   }
 
@@ -316,19 +305,18 @@ class _ReviewPageState extends State<ReviewPage> {
     ));
   }
 
-  // ─── UI ─────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(_parts.isEmpty && !_loading
-            ? 'Przegląd części'
-            : 'Przegląd (${_parts.length})'),
+            ? l10n.reviewTitleEmpty
+            : l10n.reviewTitle(_parts.length)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Odśwież',
+            tooltip: l10n.refresh,
             onPressed: _loading ? null : _loadData,
           ),
         ],
@@ -336,13 +324,13 @@ class _ReviewPageState extends State<ReviewPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? _buildError()
-              : _buildBody(),
-      bottomNavigationBar: _buildBottomBar(),
+              ? _buildError(l10n)
+              : _buildBody(l10n),
+      bottomNavigationBar: _buildBottomBar(l10n),
     );
   }
 
-  Widget _buildError() => Center(
+  Widget _buildError(AppLocalizations l10n) => Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -352,21 +340,21 @@ class _ReviewPageState extends State<ReviewPage> {
               const SizedBox(height: 12),
               Text(_error!, textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: _loadData, child: const Text('Spróbuj ponownie')),
+              ElevatedButton(onPressed: _loadData, child: Text(l10n.tryAgain)),
             ],
           ),
         ),
       );
 
-  Widget _buildBody() {
+  Widget _buildBody(AppLocalizations l10n) {
     if (_parts.isEmpty && _confirmedParts.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
-            SizedBox(height: 12),
-            Text('Brak części do przeglądu'),
+            const Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
+            const SizedBox(height: 12),
+            Text(l10n.noPartsToReview),
           ],
         ),
       );
@@ -374,14 +362,14 @@ class _ReviewPageState extends State<ReviewPage> {
 
     return Column(
       children: [
-        _buildLabelTypeSelector(),
-        if (_parts.isNotEmpty) _buildTopActions(),
+        _buildLabelTypeSelector(l10n),
+        if (_parts.isNotEmpty) _buildTopActions(l10n),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.only(bottom: 8),
             children: [
               ..._parts.map(_buildPartCard),
-              if (_confirmedParts.isNotEmpty) _buildConfirmedBanner(),
+              if (_confirmedParts.isNotEmpty) _buildConfirmedBanner(l10n),
             ],
           ),
         ),
@@ -389,7 +377,7 @@ class _ReviewPageState extends State<ReviewPage> {
     );
   }
 
-  Widget _buildLabelTypeSelector() {
+  Widget _buildLabelTypeSelector(AppLocalizations l10n) {
     final locked = _confirmedParts.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
@@ -399,16 +387,16 @@ class _ReviewPageState extends State<ReviewPage> {
           if (locked) const SizedBox(width: 4),
           Expanded(
             child: SegmentedButton<LabelTypeChoice>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: LabelTypeChoice.drawer,
-                  icon: Icon(Icons.view_module, size: 16),
-                  label: Text('Szufladkowa'),
+                  icon: const Icon(Icons.view_module, size: 16),
+                  label: Text(l10n.drawerLabel),
                 ),
                 ButtonSegment(
                   value: LabelTypeChoice.spool,
-                  icon: Icon(Icons.radio_button_checked, size: 16),
-                  label: Text('Szpulkowa'),
+                  icon: const Icon(Icons.radio_button_checked, size: 16),
+                  label: Text(l10n.spoolLabel),
                 ),
               ],
               selected: _labelType != null ? {_labelType!} : {},
@@ -428,14 +416,14 @@ class _ReviewPageState extends State<ReviewPage> {
                 _labelType = null;
               }),
               style: TextButton.styleFrom(foregroundColor: Colors.orange),
-              child: const Text('Reset'),
+              child: Text(l10n.reset),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildTopActions() {
+  Widget _buildTopActions(AppLocalizations l10n) {
     final selCount = _selected.length;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -457,13 +445,13 @@ class _ReviewPageState extends State<ReviewPage> {
           const Spacer(),
           TextButton.icon(
             icon: const Icon(Icons.auto_fix_high, size: 16),
-            label: const Text('Generuj IPN'),
+            label: Text(l10n.generateIpnBtn),
             onPressed: _selected.isEmpty ? null : _generateIpns,
           ),
           const SizedBox(width: 4),
           TextButton.icon(
             icon: const Icon(Icons.place, size: 16),
-            label: const Text('Lokalizacja'),
+            label: Text(l10n.location),
             onPressed: _selected.isEmpty ? null : _assignLocation,
           ),
         ],
@@ -474,6 +462,7 @@ class _ReviewPageState extends State<ReviewPage> {
   Widget _buildPartCard(Part p) {
     final ready = _isReady(p);
     final selected = _selected.contains(p.id);
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -543,19 +532,19 @@ class _ReviewPageState extends State<ReviewPage> {
                   const SizedBox(width: 8),
                   Expanded(
                     flex: 5,
-                    child: _buildLocationDropdown(p),
+                    child: _buildLocationDropdown(p, l10n),
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
                     width: 64,
                     child: TextField(
                       controller: _amountControllers[p.id],
-                      decoration: const InputDecoration(
-                        labelText: 'Ilość',
+                      decoration: InputDecoration(
+                        labelText: l10n.quantity,
                         isDense: true,
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       style: const TextStyle(fontSize: 13),
                       keyboardType:
@@ -571,26 +560,26 @@ class _ReviewPageState extends State<ReviewPage> {
     );
   }
 
-  Widget _buildLocationDropdown(Part p) {
+  Widget _buildLocationDropdown(Part p, AppLocalizations l10n) {
     final current = _locationDraft[p.id];
     return InputDecorator(
-      decoration: const InputDecoration(
-        labelText: 'Lokalizacja',
+      decoration: InputDecoration(
+        labelText: l10n.locationLabel,
         isDense: true,
-        contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        border: OutlineInputBorder(),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        border: const OutlineInputBorder(),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<StorageLocation>(
           value: current,
           isExpanded: true,
           isDense: true,
-          hint: const Text('Wybierz…', style: TextStyle(fontSize: 12)),
+          hint: Text(l10n.chooseDots, style: const TextStyle(fontSize: 12)),
           style: const TextStyle(fontSize: 12, overflow: TextOverflow.ellipsis),
           items: [
-            const DropdownMenuItem<StorageLocation>(
+            DropdownMenuItem<StorageLocation>(
               value: null,
-              child: Text('— brak —', style: TextStyle(fontSize: 12)),
+              child: Text(l10n.none, style: const TextStyle(fontSize: 12)),
             ),
             ..._locations.map((l) => DropdownMenuItem(
                   value: l,
@@ -603,7 +592,7 @@ class _ReviewPageState extends State<ReviewPage> {
     );
   }
 
-  Widget _buildConfirmedBanner() {
+  Widget _buildConfirmedBanner(AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -616,14 +605,14 @@ class _ReviewPageState extends State<ReviewPage> {
         children: [
           const Icon(Icons.check_circle, color: Colors.green, size: 18),
           const SizedBox(width: 8),
-          Text('Zatwierdzone: ${_confirmedParts.length} części',
+          Text(l10n.confirmedBanner(_confirmedParts.length),
               style: const TextStyle(color: Colors.green)),
         ],
       ),
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(AppLocalizations l10n) {
     final readyCount = _parts
         .where((p) => _selected.contains(p.id) && _isReady(p))
         .length;
@@ -649,7 +638,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      _niimbot.isConnected ? 'Podłączono' : 'Brak drukarki',
+                      _niimbot.isConnected ? l10n.printerConnected : l10n.noPrinter,
                       style: TextStyle(
                           fontSize: 12,
                           color: _niimbot.isConnected ? Colors.blue : Colors.grey),
@@ -663,7 +652,7 @@ class _ReviewPageState extends State<ReviewPage> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.print, size: 16),
-                      label: Text('Drukuj ${_confirmedParts.length} etykiet'),
+                      label: Text(l10n.printLabelsCount(_confirmedParts.length)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
@@ -680,8 +669,8 @@ class _ReviewPageState extends State<ReviewPage> {
                     icon: const Icon(Icons.check, size: 16),
                     label: Text(
                       readyCount > 0
-                          ? 'Zatwierdź ($readyCount)'
-                          : 'Zatwierdź zaznaczone',
+                          ? l10n.confirmReady(readyCount)
+                          : l10n.confirmSelected,
                     ),
                     onPressed: (_confirming || readyCount == 0) ? null : _confirmSelected,
                   ),

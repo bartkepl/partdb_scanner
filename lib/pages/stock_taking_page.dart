@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/part.dart';
 import '../services/api_service.dart';
 import 'barcode_scan_page.dart';
@@ -34,6 +35,7 @@ class _StockTakingPageState extends State<StockTakingPage> {
   bool _saving = false;
 
   Future<void> _scanNext() async {
+    final l10n = AppLocalizations.of(context)!;
     final raw = await Navigator.push<String>(
       context,
       MaterialPageRoute(builder: (_) => BarcodeScanPage(apiService: widget.apiService)),
@@ -46,26 +48,26 @@ class _StockTakingPageState extends State<StockTakingPage> {
           ? await widget.apiService.findPartByIPN(raw)
           : (await widget.apiService.searchByName(raw)).firstOrNull;
 
+      if (!mounted) return;
+
       if (part == null) {
-        _showMsg('Nie znaleziono: $raw', isError: true);
+        _showMsg(l10n.notFound(raw), isError: true);
         return;
       }
 
       if (part.partLots.isEmpty) {
-        _showMsg('${part.name}: brak lokalizacji magazynowych', isError: true);
+        _showMsg(l10n.noStorageLocations(part.name), isError: true);
         return;
       }
 
-      // Jedna lokalizacja — dodaj od razu; wiele — zapytaj
       final lot = part.partLots.length == 1
           ? part.partLots.first
           : await _chooseLot(part);
       if (lot == null) return;
 
-      // Nie dodawaj duplikatu
       final existing = _scanned.where((e) => e.lot.id == lot.id).firstOrNull;
       if (existing != null) {
-        _showMsg('${part.name} już na liście (${lot.locationName})', isError: false);
+        _showMsg(l10n.alreadyOnList(part.name, lot.locationName), isError: false);
         return;
       }
 
@@ -78,23 +80,25 @@ class _StockTakingPageState extends State<StockTakingPage> {
         ));
       });
     } catch (e) {
-      _showMsg('Błąd: $e', isError: true);
+      if (!mounted) return;
+      _showMsg(l10n.errorGeneric(e.toString()), isError: true);
     } finally {
       if (mounted) setState(() => _scanning = false);
     }
   }
 
   Future<PartLot?> _chooseLot(Part part) async {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<PartLot>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Wybierz lokalizację: ${part.name}'),
+        title: Text(l10n.chooseLocation(part.name)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: part.partLots
               .map((l) => ListTile(
                     title: Text(l.locationName),
-                    subtitle: Text('Stan: ${l.amount.toInt()}'),
+                    subtitle: Text(AppLocalizations.of(ctx)!.stockAmount(l.amount.toInt())),
                     onTap: () => Navigator.pop(ctx, l),
                   ))
               .toList(),
@@ -104,20 +108,21 @@ class _StockTakingPageState extends State<StockTakingPage> {
   }
 
   Future<void> _saveAll() async {
+    final l10n = AppLocalizations.of(context)!;
     final toSave = _scanned.where((e) => e.hasDiscrepancy).toList();
     if (toSave.isEmpty) {
-      _showMsg('Brak rozbieżności do zapisania');
+      _showMsg(l10n.noDiscrepancies);
       return;
     }
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Zapisz korekty?'),
-        content: Text('Zostanie zaktualizowanych ${toSave.length} pozycji.'),
+        title: Text(l10n.saveCorrectionsTitle),
+        content: Text(l10n.willUpdatePositions(toSave.length)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Anuluj')),
-          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Zapisz')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.save)),
         ],
       ),
     );
@@ -130,7 +135,7 @@ class _StockTakingPageState extends State<StockTakingPage> {
         await widget.apiService.patchPartLot(
           e.lot.id,
           e.countedAmount.toDouble(),
-          comment: 'Inwentaryzacja',
+          comment: 'Stock taking',
         );
         ok++;
       } catch (_) {
@@ -139,7 +144,7 @@ class _StockTakingPageState extends State<StockTakingPage> {
     }
     if (mounted) {
       setState(() => _saving = false);
-      _showMsg('Zapisano: $ok, błędy: $fail', isError: fail > 0);
+      _showMsg(l10n.savedWithErrors(ok, fail), isError: fail > 0);
     }
   }
 
@@ -154,11 +159,12 @@ class _StockTakingPageState extends State<StockTakingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final discrepancies = _scanned.where((e) => e.hasDiscrepancy).length;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inwentaryzacja'),
+        title: Text(l10n.stockTakingTitle),
         actions: [
           if (discrepancies > 0)
             Badge(
@@ -166,14 +172,14 @@ class _StockTakingPageState extends State<StockTakingPage> {
               backgroundColor: Colors.red,
               child: IconButton(
                 icon: const Icon(Icons.save),
-                tooltip: 'Zapisz korekty',
+                tooltip: l10n.saveCorrectionsTooltip,
                 onPressed: _saving ? null : _saveAll,
               ),
             )
           else
             IconButton(
               icon: const Icon(Icons.save),
-              tooltip: 'Zapisz korekty',
+              tooltip: l10n.saveCorrectionsTooltip,
               onPressed: _saving ? null : _saveAll,
             ),
         ],
@@ -185,13 +191,13 @@ class _StockTakingPageState extends State<StockTakingPage> {
             padding: const EdgeInsets.all(12),
             child: ElevatedButton.icon(
               icon: const Icon(Icons.qr_code_scanner),
-              label: const Text('Skanuj następną część'),
+              label: Text(l10n.scanNextPart),
               style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
               onPressed: _scanning ? null : _scanNext,
             ),
           ),
           if (_scanned.isEmpty)
-            const Expanded(child: Center(child: Text('Zeskanuj IPN lub nazwę części')))
+            Expanded(child: Center(child: Text(l10n.scanIpnOrName)))
           else
             Expanded(
               child: ListView.builder(
