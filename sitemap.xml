@@ -1,55 +1,185 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/api/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/api/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/api/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/api/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/getting-started/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/getting-started/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/getting-started/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/models/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/models/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/models/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/models/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/architecture/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/architecture/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/architecture/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/pages/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/pages/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/pages/category-browser/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/pages/category-browser/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/category-browser/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/category-browser/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/pages/config/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/pages/config/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/config/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/config/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/pages/ipn-generator/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/pages/ipn-generator/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/ipn-generator/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/ipn-generator/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/pages/label-print/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/pages/label-print/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/label-print/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/label-print/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/pages/part-detail/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/pages/part-detail/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/part-detail/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/part-detail/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/pages/search/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/pages/search/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/search/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/search/"/>
     </url>
     <url>
-         <loc>https://bartkepl.github.io/partdb_scanner/pages/stock-taking/</loc>
-         <lastmod>2026-06-17</lastmod>
+        <loc>https://bartkepl.github.io/partdb_scanner/pages/stock-taking/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/stock-taking/"/>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/stock-taking/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/api/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/api/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/api/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/getting-started/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/getting-started/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/getting-started/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/models/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/models/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/architecture/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/architecture/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/pages/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/pages/category-browser/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/category-browser/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/category-browser/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/pages/config/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/config/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/config/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/pages/ipn-generator/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/ipn-generator/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/ipn-generator/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/pages/label-print/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/label-print/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/label-print/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/pages/part-detail/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/part-detail/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/part-detail/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/pages/search/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/search/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/search/"/>
+    </url>
+    <url>
+        <loc>https://bartkepl.github.io/partdb_scanner/pl/pages/stock-taking/</loc>
+        <lastmod>2026-06-17</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="pl" href="https://bartkepl.github.io/partdb_scanner/pl/pages/stock-taking/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bartkepl.github.io/partdb_scanner/pages/stock-taking/"/>
     </url>
 </urlset>

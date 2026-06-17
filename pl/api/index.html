@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="pl" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -12,7 +12,7 @@
         <meta name="author" content="bartkepl">
       
       
-        <link rel="canonical" href="https://bartkepl.github.io/partdb_scanner/api/">
+        <link rel="canonical" href="https://bartkepl.github.io/partdb_scanner/pl/api/">
       
       
         <link rel="prev" href="../pages/config/">
@@ -22,25 +22,25 @@
       
       
         
-          <link rel="alternate" href="./" hreflang="en">
+          <link rel="alternate" href="../../api/" hreflang="en">
         
-          <link rel="alternate" href="../pl/api/" hreflang="pl">
+          <link rel="alternate" href="./" hreflang="pl">
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>REST API - PartDB Scanner</title>
+        <title>API REST - PartDB Scanner</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -59,7 +59,7 @@
       
     
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -84,8 +84,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#rest-api" class="md-skip">
-          Skip to content
+        <a href="#api-rest" class="md-skip">
+          Przejdź do treści
         </a>
       
     </div>
@@ -99,8 +99,8 @@
   
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="PartDB Scanner" class="md-header__button md-logo" aria-label="PartDB Scanner" data-md-component="logo">
+  <nav class="md-header__inner md-grid" aria-label="Nagłówek">
+    <a href="../" title="PartDB Scanner" class="md-header__button md-logo" aria-label="PartDB Scanner" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              REST API
+              API REST
             
           </span>
         </div>
@@ -160,20 +160,20 @@
       <div class="md-header__option">
   <div class="md-select">
     
-    <button class="md-header__button md-icon" aria-label="Select language">
+    <button class="md-header__button md-icon" aria-label="Wybierz język">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
     </button>
     <div class="md-select__inner">
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="./" hreflang="en" class="md-select__link">
+            <a href="../../api/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="../pl/api/" hreflang="pl" class="md-select__link">
+            <a href="./" hreflang="pl" class="md-select__link">
               Polski
             </a>
           </li>
@@ -194,16 +194,16 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Szukaj" placeholder="Szukaj" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="Search">
+      <nav class="md-search__options" aria-label="Szukaj">
         
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Wyczyść" aria-label="Wyczyść" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
@@ -216,7 +216,7 @@
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            Initializing search
+            Inicjowanie wyszukiwania
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -228,7 +228,7 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/bartkepl/partdb_scanner" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/bartkepl/partdb_scanner" title="Przejdź do repozytorium" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
@@ -243,7 +243,7 @@
   
     
       
-<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Zakładki" data-md-component="tabs">
   <div class="md-grid">
     <ul class="md-tabs__list">
       
@@ -253,13 +253,13 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../" class="md-tabs__link">
         
   
   
     
   
-  Home
+  Strona główna
 
       </a>
     </li>
@@ -278,7 +278,7 @@
   
     
   
-  Getting started
+  Pierwsze kroki
 
       </a>
     </li>
@@ -299,7 +299,7 @@
   
     
   
-  Architecture
+  Architektura
 
         </a>
       </li>
@@ -321,7 +321,7 @@
   
     
   
-  Screens
+  Ekrany
 
         </a>
       </li>
@@ -343,7 +343,7 @@
   
     
   
-  REST API
+  API REST
 
       </a>
     </li>
@@ -362,7 +362,7 @@
   
     
   
-  Data models
+  Modele danych
 
       </a>
     </li>
@@ -395,9 +395,9 @@
   
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Nawigacja" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="PartDB Scanner" class="md-nav__button md-logo" aria-label="PartDB Scanner" data-md-component="logo">
+    <a href="../" title="PartDB Scanner" class="md-nav__button md-logo" aria-label="PartDB Scanner" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -407,7 +407,7 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/bartkepl/partdb_scanner" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/bartkepl/partdb_scanner" title="Przejdź do repozytorium" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
@@ -427,14 +427,14 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Home
+    Strona główna
   
 
     
@@ -461,7 +461,7 @@
   <span class="md-ellipsis">
     
   
-    Getting started
+    Pierwsze kroki
   
 
     
@@ -511,7 +511,7 @@
   <span class="md-ellipsis">
     
   
-    Architecture
+    Architektura
   
 
     
@@ -528,7 +528,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Architecture
+    Architektura
   
 
           </label>
@@ -594,7 +594,7 @@
   <span class="md-ellipsis">
     
   
-    Screens
+    Ekrany
   
 
     
@@ -616,7 +616,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Screens
+    Ekrany
   
 
           </label>
@@ -638,7 +638,7 @@
   <span class="md-ellipsis">
     
   
-    Search
+    Wyszukiwanie
   
 
     
@@ -666,7 +666,7 @@
   <span class="md-ellipsis">
     
   
-    Part details
+    Szczegóły części
   
 
     
@@ -694,7 +694,7 @@
   <span class="md-ellipsis">
     
   
-    Category browser
+    Przeglądarka kategorii
   
 
     
@@ -722,7 +722,7 @@
   <span class="md-ellipsis">
     
   
-    IPN generator
+    Generator IPN
   
 
     
@@ -750,7 +750,7 @@
   <span class="md-ellipsis">
     
   
-    Stock taking
+    Inwentaryzacja
   
 
     
@@ -778,7 +778,7 @@
   <span class="md-ellipsis">
     
   
-    Label printing
+    Drukowanie etykiet
   
 
     
@@ -806,7 +806,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration
+    Konfiguracja
   
 
     
@@ -850,7 +850,7 @@
   <span class="md-ellipsis">
     
   
-    REST API
+    API REST
   
 
     
@@ -868,7 +868,7 @@
   <span class="md-ellipsis">
     
   
-    REST API
+    API REST
   
 
     
@@ -880,7 +880,7 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+<nav class="md-nav md-nav--secondary" aria-label="Spis treści">
   
   
   
@@ -889,15 +889,15 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      Spis treści
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#uwierzytelnianie" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        Uwierzytelnianie
       
     </span>
   </a>
@@ -905,10 +905,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#common-parameters" class="md-nav__link">
+  <a href="#wspolne-parametry" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Common parameters
+        Wspólne parametry
       
     </span>
   </a>
@@ -916,10 +916,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#timeouts" class="md-nav__link">
+  <a href="#timeouty" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Timeouts
+        Timeouty
       
     </span>
   </a>
@@ -927,22 +927,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#endpoints" class="md-nav__link">
+  <a href="#endpointy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Endpoints
+        Endpointy
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Endpoints">
+    <nav class="md-nav" aria-label="Endpointy">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#token-verification" class="md-nav__link">
+  <a href="#weryfikacja-tokenu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Token verification
+        Weryfikacja tokenu
       
     </span>
   </a>
@@ -950,10 +950,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#search-by-ipn" class="md-nav__link">
+  <a href="#wyszukiwanie-po-ipn" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Search by IPN
+        Wyszukiwanie po IPN
       
     </span>
   </a>
@@ -961,10 +961,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#search-by-name" class="md-nav__link">
+  <a href="#wyszukiwanie-po-nazwie" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Search by name
+        Wyszukiwanie po nazwie
       
     </span>
   </a>
@@ -972,10 +972,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fetch-all-parts" class="md-nav__link">
+  <a href="#pobieranie-wszystkich-czesci" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fetch all parts
+        Pobieranie wszystkich części
       
     </span>
   </a>
@@ -983,10 +983,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#part-details" class="md-nav__link">
+  <a href="#szczegoy-czesci" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Part details
+        Szczegóły części
       
     </span>
   </a>
@@ -994,10 +994,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#update-a-storage-lot" class="md-nav__link">
+  <a href="#aktualizacja-partii-magazynowej" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Update a storage lot
+        Aktualizacja partii magazynowej
       
     </span>
   </a>
@@ -1005,10 +1005,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#update-a-parameter" class="md-nav__link">
+  <a href="#aktualizacja-parametru" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Update a parameter
+        Aktualizacja parametru
       
     </span>
   </a>
@@ -1016,10 +1016,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#assign-an-ipn" class="md-nav__link">
+  <a href="#nadanie-ipn" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Assign an IPN
+        Nadanie IPN
       
     </span>
   </a>
@@ -1027,10 +1027,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fetch-categories" class="md-nav__link">
+  <a href="#pobieranie-kategorii" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fetch categories
+        Pobieranie kategorii
       
     </span>
   </a>
@@ -1038,10 +1038,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fetch-attachment-types" class="md-nav__link">
+  <a href="#pobieranie-typow-zaacznikow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fetch attachment types
+        Pobieranie typów załączników
       
     </span>
   </a>
@@ -1049,10 +1049,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#upload-an-attachment-photo" class="md-nav__link">
+  <a href="#upload-zaacznika-zdjecie" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Upload an attachment (photo)
+        Upload załącznika (zdjęcie)
       
     </span>
   </a>
@@ -1065,10 +1065,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
+  <a href="#obsuga-bedow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error handling
+        Obsługa błędów
       
     </span>
   </a>
@@ -1097,7 +1097,7 @@
   <span class="md-ellipsis">
     
   
-    Data models
+    Modele danych
   
 
     
@@ -1123,7 +1123,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+<nav class="md-nav md-nav--secondary" aria-label="Spis treści">
   
   
   
@@ -1132,15 +1132,15 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      Spis treści
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#uwierzytelnianie" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        Uwierzytelnianie
       
     </span>
   </a>
@@ -1148,10 +1148,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#common-parameters" class="md-nav__link">
+  <a href="#wspolne-parametry" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Common parameters
+        Wspólne parametry
       
     </span>
   </a>
@@ -1159,10 +1159,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#timeouts" class="md-nav__link">
+  <a href="#timeouty" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Timeouts
+        Timeouty
       
     </span>
   </a>
@@ -1170,22 +1170,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#endpoints" class="md-nav__link">
+  <a href="#endpointy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Endpoints
+        Endpointy
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Endpoints">
+    <nav class="md-nav" aria-label="Endpointy">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#token-verification" class="md-nav__link">
+  <a href="#weryfikacja-tokenu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Token verification
+        Weryfikacja tokenu
       
     </span>
   </a>
@@ -1193,10 +1193,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#search-by-ipn" class="md-nav__link">
+  <a href="#wyszukiwanie-po-ipn" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Search by IPN
+        Wyszukiwanie po IPN
       
     </span>
   </a>
@@ -1204,10 +1204,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#search-by-name" class="md-nav__link">
+  <a href="#wyszukiwanie-po-nazwie" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Search by name
+        Wyszukiwanie po nazwie
       
     </span>
   </a>
@@ -1215,10 +1215,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fetch-all-parts" class="md-nav__link">
+  <a href="#pobieranie-wszystkich-czesci" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fetch all parts
+        Pobieranie wszystkich części
       
     </span>
   </a>
@@ -1226,10 +1226,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#part-details" class="md-nav__link">
+  <a href="#szczegoy-czesci" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Part details
+        Szczegóły części
       
     </span>
   </a>
@@ -1237,10 +1237,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#update-a-storage-lot" class="md-nav__link">
+  <a href="#aktualizacja-partii-magazynowej" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Update a storage lot
+        Aktualizacja partii magazynowej
       
     </span>
   </a>
@@ -1248,10 +1248,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#update-a-parameter" class="md-nav__link">
+  <a href="#aktualizacja-parametru" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Update a parameter
+        Aktualizacja parametru
       
     </span>
   </a>
@@ -1259,10 +1259,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#assign-an-ipn" class="md-nav__link">
+  <a href="#nadanie-ipn" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Assign an IPN
+        Nadanie IPN
       
     </span>
   </a>
@@ -1270,10 +1270,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fetch-categories" class="md-nav__link">
+  <a href="#pobieranie-kategorii" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fetch categories
+        Pobieranie kategorii
       
     </span>
   </a>
@@ -1281,10 +1281,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fetch-attachment-types" class="md-nav__link">
+  <a href="#pobieranie-typow-zaacznikow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fetch attachment types
+        Pobieranie typów załączników
       
     </span>
   </a>
@@ -1292,10 +1292,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#upload-an-attachment-photo" class="md-nav__link">
+  <a href="#upload-zaacznika-zdjecie" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Upload an attachment (photo)
+        Upload załącznika (zdjęcie)
       
     </span>
   </a>
@@ -1308,10 +1308,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
+  <a href="#obsuga-bedow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Error handling
+        Obsługa błędów
       
     </span>
   </a>
@@ -1338,65 +1338,65 @@
   
 
 
-<h1 id="rest-api">REST API<a class="headerlink" href="#rest-api" title="Permanent link">&para;</a></h1>
-<p>The app talks to the Part-DB server over a REST API in <strong>JSON-LD / Hydra</strong> format. Every request is authenticated with a Bearer token.</p>
+<h1 id="api-rest">API REST<a class="headerlink" href="#api-rest" title="Permanent link">&para;</a></h1>
+<p>Aplikacja komunikuje się z serwerem Part-DB przez REST API w formacie <strong>JSON-LD / Hydra</strong>. Wszystkie żądania uwierzytelniane są tokenem Bearer.</p>
 <hr />
-<h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
-<p>Each request includes the header:</p>
+<h2 id="uwierzytelnianie">Uwierzytelnianie<a class="headerlink" href="#uwierzytelnianie" title="Permanent link">&para;</a></h2>
+<p>Każde żądanie zawiera nagłówek:</p>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="err">Authorization: Bearer &lt;token&gt;</span>
 </span></code></pre></div>
-<p>The token is read from Flutter Secure Storage every time the app starts.</p>
+<p>Token pobierany jest z Flutter Secure Storage przy każdym uruchomieniu aplikacji.</p>
 <hr />
-<h2 id="common-parameters">Common parameters<a class="headerlink" href="#common-parameters" title="Permanent link">&para;</a></h2>
+<h2 id="wspolne-parametry">Wspólne parametry<a class="headerlink" href="#wspolne-parametry" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Parameter</th>
-<th>Description</th>
+<th>Parametr</th>
+<th>Opis</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>itemsPerPage</code></td>
-<td>Maximum number of results per page (default 30 in Part-DB)</td>
+<td>Maksymalna liczba wyników na stronę (domyślnie 30 w Part-DB)</td>
 </tr>
 <tr>
 <td><code>hydra:view</code></td>
-<td>Pagination – contains <code>hydra:next</code> with the URL of the next page</td>
+<td>Paginacja – zawiera <code>hydra:next</code> z URL do następnej strony</td>
 </tr>
 <tr>
 <td><code>hydra:member</code></td>
-<td>Array of results in a collection response</td>
+<td>Tablica wyników w odpowiedzi kolekcji</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="timeouts">Timeouts<a class="headerlink" href="#timeouts" title="Permanent link">&para;</a></h2>
+<h2 id="timeouty">Timeouty<a class="headerlink" href="#timeouty" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Request type</th>
+<th>Typ żądania</th>
 <th>Timeout</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Standard (GET/PATCH)</td>
+<td>Standardowe (GET/PATCH)</td>
 <td><strong>10 s</strong></td>
 </tr>
 <tr>
-<td>Attachment upload (POST)</td>
+<td>Upload załącznika (POST)</td>
 <td><strong>30 s</strong></td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="endpoints">Endpoints<a class="headerlink" href="#endpoints" title="Permanent link">&para;</a></h2>
-<h3 id="token-verification">Token verification<a class="headerlink" href="#token-verification" title="Permanent link">&para;</a></h3>
+<h2 id="endpointy">Endpointy<a class="headerlink" href="#endpointy" title="Permanent link">&para;</a></h2>
+<h3 id="weryfikacja-tokenu">Weryfikacja tokenu<a class="headerlink" href="#weryfikacja-tokenu" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="err">GET /api/tokens/current</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="err">Authorization: Bearer &lt;token&gt;</span>
 </span></code></pre></div>
-<p><strong>200 response:</strong>
+<p><strong>Odpowiedź 200:</strong>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/api/users/3&quot;</span><span class="p">,</span>
@@ -1404,37 +1404,37 @@
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="err">...</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">}</span>
 </span></code></pre></div></p>
-<p>Used by the <a href="../pages/config/">Configuration</a> screen to verify the token.</p>
+<p>Używane przez ekran <a href="../pages/config/">Konfiguracja</a> do sprawdzenia poprawności tokenu.</p>
 <hr />
-<h3 id="search-by-ipn">Search by IPN<a class="headerlink" href="#search-by-ipn" title="Permanent link">&para;</a></h3>
+<h3 id="wyszukiwanie-po-ipn">Wyszukiwanie po IPN<a class="headerlink" href="#wyszukiwanie-po-ipn" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="err">GET /api/parts?ipn={ipn}</span>
 </span></code></pre></div>
-<p><strong>Response:</strong>
+<p><strong>Odpowiedź:</strong>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;hydra:member&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Resistor 10k&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;ipn&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1234567&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rezystor 10k&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;ipn&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1234567&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="p">]</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
 </span></code></pre></div></p>
-<p>Used when the scanned/typed code is exactly 7 digits.</p>
+<p>Używane gdy scanned/wpisany kod to dokładnie 7 cyfr.</p>
 <hr />
-<h3 id="search-by-name">Search by name<a class="headerlink" href="#search-by-name" title="Permanent link">&para;</a></h3>
+<h3 id="wyszukiwanie-po-nazwie">Wyszukiwanie po nazwie<a class="headerlink" href="#wyszukiwanie-po-nazwie" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="err">GET /api/parts?name={query}&amp;itemsPerPage=100</span>
 </span></code></pre></div>
-<p>Returns up to 100 results. The search is performed server-side (LIKE).</p>
+<p>Zwraca max 100 wyników. Wyszukiwanie jest realizowane po stronie serwera (LIKE).</p>
 <hr />
-<h3 id="fetch-all-parts">Fetch all parts<a class="headerlink" href="#fetch-all-parts" title="Permanent link">&para;</a></h3>
+<h3 id="pobieranie-wszystkich-czesci">Pobieranie wszystkich części<a class="headerlink" href="#pobieranie-wszystkich-czesci" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="err">GET /api/parts?itemsPerPage=100</span>
 </span></code></pre></div>
-<p>The app follows <code>hydra:view.hydra:next</code> until it has collected every record (max <strong>2000</strong>). Used by the IPN Generator and Stock Taking.</p>
+<p>Aplikacja podąża za <code>hydra:view.hydra:next</code> aż do zebrania wszystkich rekordów (max <strong>2000</strong>). Używane przez Generator IPN i Inwentaryzację.</p>
 <hr />
-<h3 id="part-details">Part details<a class="headerlink" href="#part-details" title="Permanent link">&para;</a></h3>
+<h3 id="szczegoy-czesci">Szczegóły części<a class="headerlink" href="#szczegoy-czesci" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="err">GET /api/parts/{id}</span>
 </span></code></pre></div>
-<p><strong>Response (excerpt):</strong>
+<p><strong>Odpowiedź (fragment):</strong>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Resistor 10k&quot;</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rezystor 10k&quot;</span><span class="p">,</span>
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;ipn&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1234567&quot;</span><span class="p">,</span>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;minamount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
 </span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -1446,27 +1446,27 @@
 </span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;amount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">12.0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;storageLocation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/api/storage_locations/2&quot;</span><span class="w"> </span><span class="p">}</span>
 </span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span><span class="p">],</span>
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">  </span><span class="nt">&quot;parameters&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">101</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Value&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;10k&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Ω&quot;</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">101</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Wartość&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;10k&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;unit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Ω&quot;</span><span class="w"> </span><span class="p">}</span>
 </span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">  </span><span class="p">]</span>
 </span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="p">}</span>
 </span></code></pre></div></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The <code>category</code>, <code>manufacturer</code> and <code>storageLocation</code> fields are IRIs (references). The app resolves the names through separate requests or by parsing embedded objects.</p>
+<p>Pola <code>category</code>, <code>manufacturer</code>, <code>storageLocation</code> są IRI-ami (referencjami). Aplikacja pobiera nazwy przez osobne żądania lub parsuje z osadzonych obiektów.</p>
 </div>
 <hr />
-<h3 id="update-a-storage-lot">Update a storage lot<a class="headerlink" href="#update-a-storage-lot" title="Permanent link">&para;</a></h3>
+<h3 id="aktualizacja-partii-magazynowej">Aktualizacja partii magazynowej<a class="headerlink" href="#aktualizacja-partii-magazynowej" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="err">PATCH /api/part_lots/{id}</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="err">Content-Type: application/merge-patch+json</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="err">{</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="err">  &quot;amount&quot;: 15,</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="err">  &quot;description&quot;: &quot;Optional comment&quot;</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="err">  &quot;description&quot;: &quot;Opcjonalny komentarz&quot;</span>
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="err">}</span>
 </span></code></pre></div>
-<p><strong>200 response:</strong> the updated <code>PartLot</code> object.</p>
+<p><strong>Odpowiedź 200:</strong> zaktualizowany obiekt <code>PartLot</code>.</p>
 <hr />
-<h3 id="update-a-parameter">Update a parameter<a class="headerlink" href="#update-a-parameter" title="Permanent link">&para;</a></h3>
+<h3 id="aktualizacja-parametru">Aktualizacja parametru<a class="headerlink" href="#aktualizacja-parametru" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="err">PATCH /api/part_parameters/{id}</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="err">Content-Type: application/merge-patch+json</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
@@ -1475,7 +1475,7 @@
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="err">}</span>
 </span></code></pre></div>
 <hr />
-<h3 id="assign-an-ipn">Assign an IPN<a class="headerlink" href="#assign-an-ipn" title="Permanent link">&para;</a></h3>
+<h3 id="nadanie-ipn">Nadanie IPN<a class="headerlink" href="#nadanie-ipn" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="err">PATCH /api/parts/{id}</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="err">Content-Type: application/merge-patch+json</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
@@ -1484,49 +1484,49 @@
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="err">}</span>
 </span></code></pre></div>
 <hr />
-<h3 id="fetch-categories">Fetch categories<a class="headerlink" href="#fetch-categories" title="Permanent link">&para;</a></h3>
+<h3 id="pobieranie-kategorii">Pobieranie kategorii<a class="headerlink" href="#pobieranie-kategorii" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="err">GET /api/categories?itemsPerPage=200</span>
 </span></code></pre></div>
-<p>The app fetches up to <strong>200</strong> categories, paging through <code>hydra:next</code>. Used by the <a href="../pages/category-browser/">Category browser</a>.</p>
-<p><strong>Response (excerpt):</strong>
+<p>Aplikacja pobiera do <strong>200</strong> kategorii stronicując przez <code>hydra:next</code>. Używane przez <a href="../pages/category-browser/">Przeglądarkę kategorii</a>.</p>
+<p><strong>Odpowiedź (fragment):</strong>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&quot;hydra:member&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Resistors&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Rezystory&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">},</span>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SMD&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/api/categories/1&quot;</span><span class="w"> </span><span class="p">}</span>
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="p">]</span>
 </span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">}</span>
 </span></code></pre></div></p>
 <hr />
-<h3 id="fetch-attachment-types">Fetch attachment types<a class="headerlink" href="#fetch-attachment-types" title="Permanent link">&para;</a></h3>
+<h3 id="pobieranie-typow-zaacznikow">Pobieranie typów załączników<a class="headerlink" href="#pobieranie-typow-zaacznikow" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="err">GET /api/attachment_types?itemsPerPage=1</span>
 </span></code></pre></div>
-<p>Fetches the first available attachment type to use when uploading a photo.</p>
+<p>Pobiera pierwszy dostępny typ załącznika do użycia przy uploadzie zdjęcia.</p>
 <hr />
-<h3 id="upload-an-attachment-photo">Upload an attachment (photo)<a class="headerlink" href="#upload-an-attachment-photo" title="Permanent link">&para;</a></h3>
+<h3 id="upload-zaacznika-zdjecie">Upload załącznika (zdjęcie)<a class="headerlink" href="#upload-zaacznika-zdjecie" title="Permanent link">&para;</a></h3>
 <div class="language-http highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="err">POST /api/attachments</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="err">Content-Type: application/ld+json</span>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="err">Authorization: Bearer &lt;token&gt;</span>
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
 </span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="err">{</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="err">  &quot;name&quot;: &quot;Photo - Resistor 10k&quot;,</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="err">  &quot;name&quot;: &quot;Zdjęcie - Rezystor 10k&quot;,</span>
 </span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="err">  &quot;element&quot;: &quot;/api/parts/42&quot;,</span>
 </span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="err">  &quot;uploadFile&quot;: &quot;data:image/jpeg;base64,/9j/4AAQSkZJRgAB...&quot;,</span>
 </span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="err">  &quot;attachment_type&quot;: &quot;/api/attachment_types/1&quot;</span>
 </span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="err">}</span>
 </span></code></pre></div>
-<p><strong>201 response:</strong> the attachment object.</p>
-<p>The photo is taken from the camera or gallery, compressed to JPEG and base64-encoded directly in the request body.</p>
+<p><strong>Odpowiedź 201:</strong> obiekt załącznika.</p>
+<p>Zdjęcie jest pobierane z aparatu lub galerii, kompresowane do JPEG i kodowane base64 bezpośrednio w body żądania.</p>
 <hr />
-<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
-<p>The app parses error responses in the following order:</p>
+<h2 id="obsuga-bedow">Obsługa błędów<a class="headerlink" href="#obsuga-bedow" title="Permanent link">&para;</a></h2>
+<p>Aplikacja parsuje odpowiedzi błędów w następującej kolejności:</p>
 <ol>
-<li>The <code>hydra:description</code> field</li>
-<li>The <code>violations[].message</code> array (validation errors)</li>
-<li>The <code>detail</code> field</li>
-<li>The HTTP status text</li>
+<li>Pole <code>hydra:description</code></li>
+<li>Tablica <code>violations[].message</code> (błędy walidacji)</li>
+<li>Pole <code>detail</code></li>
+<li>Tekst statusu HTTP</li>
 </ol>
-<p>Errors are shown to the user through a <code>SnackBar</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// Example validation error response (422)</span>
+<p>Błędy wyświetlane są użytkownikowi przez <code>SnackBar</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// Przykładowa odpowiedź błędu walidacji (422)</span>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="p">{</span>
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="s2">&quot;@type&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;ConstraintViolationList&quot;</span><span class="p">,</span>
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="s2">&quot;violations&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
@@ -1557,7 +1557,7 @@
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
-  Back to top
+  Powrót do góry
 </button>
         
       </main>
@@ -1589,10 +1589,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.indexes", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.indexes", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Skopiowano do schowka", "clipboard.copy": "Kopiuj do schowka", "search.result.more.one": "1 wi\u0119cej na tej stronie", "search.result.more.other": "# wi\u0119cej na tej stronie", "search.result.none": "Brak wynik\u00f3w wyszukiwania", "search.result.one": "Wyniki wyszukiwania: 1", "search.result.other": "Wyniki wyszukiwania: #", "search.result.placeholder": "Zacznij pisa\u0107, aby szuka\u0107", "search.result.term.missing": "Brak", "select.version": "Wybierz wersj\u0119"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
