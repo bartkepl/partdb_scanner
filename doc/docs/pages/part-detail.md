@@ -1,88 +1,88 @@
-# Szczegóły części
+# Part details
 
-Ekran szczegółów otwierany jest po wybraniu pozycji z listy wyszukiwania lub z widoku kategorii.
-
----
-
-## Nagłówek
-
-Wyświetla podstawowe dane identyfikacyjne (tylko do odczytu):
-
-| Pole | Opis |
-|------|------|
-| **Nazwa** | Pełna nazwa części |
-| **ID** | Wewnętrzny identyfikator Part-DB |
-| **IPN** | Identyfikator części (7 cyfr), jeśli nadany |
-| **Kategoria** | Nazwa kategorii Part-DB |
-| **Producent** | Nazwa producenta (jeśli wypełniona) |
-| **Tagi** | Tagi przypisane w Part-DB |
-| **Opis** | Opis tekstowy części |
-| **Komentarz** | Komentarz wewnętrzny |
+The details screen opens after selecting an item from the search list or from the category view.
 
 ---
 
-## Stany magazynowe
+## Header
 
-Sekcja **Lokalizacje** pokazuje wszystkie partie (PartLot) z ich ilościami i nazwami lokalizacji.
+Displays the basic identifying data (read-only):
+
+| Field | Description |
+|-------|-------------|
+| **Name** | Full part name |
+| **ID** | Internal Part-DB identifier |
+| **IPN** | Part identifier (7 digits), if assigned |
+| **Category** | Part-DB category name |
+| **Manufacturer** | Manufacturer name (if filled in) |
+| **Tags** | Tags assigned in Part-DB |
+| **Description** | Text description of the part |
+| **Comment** | Internal comment |
+
+---
+
+## Stock levels
+
+The **Locations** section shows all lots (PartLot) with their quantities and location names.
 
 ```
 ┌──────────────────────────────────────────┐
-│  Lokalizacja: Szuflada A3                │
-│  [−]  [  12  ]  [+]  [💬 komentarz]  [✓]│
+│  Location: Drawer A3                     │
+│  [−]  [  12  ]  [+]  [💬 comment]    [✓]│
 │                                          │
-│  Lokalizacja: Szuflada B1                │
-│  [−]  [   5  ]  [+]  [💬 komentarz]  [✓]│
+│  Location: Drawer B1                     │
+│  [−]  [   5  ]  [+]  [💬 comment]    [✓]│
 └──────────────────────────────────────────┘
 ```
 
-- Przycisk `✓` wysyła żądanie `PATCH /api/part_lots/{id}` z nową ilością i opcjonalnym komentarzem.
-- Komentarz zapisywany jest w polu `description` partii magazynowej.
-- Całkowity stan wyświetlany jest w nagłówku: `Stan: 17 szt`.
+- The `✓` button sends a `PATCH /api/part_lots/{id}` request with the new quantity and an optional comment.
+- The comment is saved in the lot's `description` field.
+- The total stock is shown in the header: `Stock: 17 pcs`.
 
-!!! info "Niski stan"
-    Jeśli `totalStock < minAmount` (i `minAmount > 0`), wyświetlane jest ostrzeżenie z ikoną ⚠ i aktualną wartością minimalną.
-
----
-
-## Parametry
-
-Lista parametrów technicznych z możliwością edycji wartości.
-
-Kolejność wyświetlania (priorytet malejący):
-
-1. Wartość / Rezystancja / Pojemność / Indukcyjność
-2. Obudowa
-3. Napięcie / Napięcie pracy
-4. Moc
-5. Producent
-6. Pozostałe – alfabetycznie
-
-Kliknięcie wartości parametru otwiera inline pole edycji. Po zatwierdzeniu wysyłane jest `PATCH /api/part_parameters/{id}`.
+!!! info "Low stock"
+    If `totalStock < minAmount` (and `minAmount > 0`), a warning with a ⚠ icon and the current minimum value is shown.
 
 ---
 
-## Pasek narzędzi
+## Parameters
 
-| Ikona | Akcja |
-|-------|-------|
-| 🔄 Odśwież | Pobiera ponownie pełne dane z serwera |
-| 🖨 Drukuj | Otwiera wybór drukarki (Sunmi lub [Niimbot](label-print.md)) |
-| 📷 Zdjęcie | Dodaje zdjęcie jako załącznik do części |
+A list of technical parameters with editable values.
 
-### Dodawanie zdjęcia
+Display order (decreasing priority):
 
-1. Kliknij ikonę aparatu.
-2. Wybierz źródło: **Aparat** lub **Galeria**.
-3. Zdjęcie jest kompresowane i kodowane base64.
-4. Wysyłane jest `POST /api/attachments` z danymi MIME i odniesieniem do części.
+1. Value / Resistance / Capacitance / Inductance
+2. Package
+3. Voltage / Operating voltage
+4. Power
+5. Manufacturer
+6. The rest – alphabetically
 
-Obsługiwane typy MIME: `image/jpeg`, `image/png`, `image/gif`, `image/webp`.
+Tapping a parameter value opens an inline edit field. After confirming, `PATCH /api/part_parameters/{id}` is sent.
 
 ---
 
-## Drukowanie – Sunmi
+## Toolbar
 
-Jeśli aplikacja działa na urządzeniu Sunmi z wbudowaną drukarką termiczną:
+| Icon | Action |
+|------|--------|
+| 🔄 Refresh | Re-fetches the full data from the server |
+| 🖨 Print | Opens the printer selection (Sunmi or [Niimbot](label-print.md)) |
+| 📷 Photo | Adds a photo as an attachment to the part |
 
-- Wydruk zawiera: nazwę, IPN, parametry, lokalizacje oraz kod QR z IPN.
-- Formatowanie: pogrubienie nagłówków, wyrównanie do prawej dla wartości.
+### Adding a photo
+
+1. Tap the camera icon.
+2. Choose the source: **Camera** or **Gallery**.
+3. The photo is compressed and base64-encoded.
+4. `POST /api/attachments` is sent with the MIME data and a reference to the part.
+
+Supported MIME types: `image/jpeg`, `image/png`, `image/gif`, `image/webp`.
+
+---
+
+## Printing – Sunmi
+
+If the app runs on a Sunmi device with a built-in thermal printer:
+
+- The printout contains: name, IPN, parameters, locations and a QR code with the IPN.
+- Formatting: bold headers, right-aligned values.

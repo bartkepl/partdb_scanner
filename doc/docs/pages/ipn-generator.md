@@ -1,83 +1,83 @@
-# Generator IPN
+# IPN generator
 
-Ekran **Generator IPN** służy do masowego nadawania identyfikatorów IPN częściom, które ich jeszcze nie posiadają.
-
----
-
-## Czym jest IPN?
-
-IPN (*Internal Part Number*) to unikalny 7-cyfrowy identyfikator w zakresie `1 000 000 – 9 999 999`. Służy do jednoznacznego oznaczenia komponentu – np. kodem QR lub Data Matrix na etykiecie szpuli.
+The **IPN generator** screen is used to bulk-assign IPN identifiers to parts that do not have one yet.
 
 ---
 
-## Przepływ pracy
+## What is an IPN?
+
+An IPN (*Internal Part Number*) is a unique 7-digit identifier in the range `1,000,000 – 9,999,999`. It uniquely labels a component – for example with a QR or Data Matrix code on a reel label.
+
+---
+
+## Workflow
 
 ```mermaid
 graph TD
-    A[Pobierz wszystkie części\nbez IPN] --> B[Wyświetl listę z\ncheckboxami]
-    B --> C{Zaznacz części}
-    C --> D[Generuj losowe IPN\nbez kolizji]
-    D --> E[Podgląd w dialogu\npotwierdzenia]
-    E -->|Zatwierdź| F[PATCH /api/parts/{id}\ndla każdej zaznaczonej części]
-    F --> G[Wyświetl wyniki\n✅/❌ per część]
+    A[Fetch all parts\nwithout an IPN] --> B[Show a list with\ncheckboxes]
+    B --> C{Select parts}
+    C --> D[Generate random IPNs\nwithout collisions]
+    D --> E[Preview in a\nconfirmation dialog]
+    E -->|Confirm| F[PATCH /api/parts/{id}\nfor each selected part]
+    F --> G[Show results\n✅/❌ per part]
     G --> A
 ```
 
 ---
 
-## Interfejs
+## Interface
 
-### Lista części bez IPN
+### List of parts without an IPN
 
-Po wejściu na zakładkę aplikacja pobiera wszystkie części (`fetchAllParts()`) i filtruje te z pustym polem IPN.
+On entering the tab the app fetches all parts (`fetchAllParts()`) and filters those with an empty IPN field.
 
 ```
-☑  Selekcja wszystkich
+☑  Select all
 
-☐  Rezystor 100Ω         ID: 42
-☑  Kondensator 10µF      ID: 87
-☐  LED czerwona          ID: 103
+☐  Resistor 100Ω         ID: 42
+☑  Capacitor 10µF        ID: 87
+☐  Red LED               ID: 103
 ...
 
-[Generuj IPN dla zaznaczonych]
+[Generate IPN for selected]
 ```
 
-- Checkbox **„Selekcja wszystkich"** zaznacza / odznacza całą listę.
-- Każda pozycja pokazuje nazwę i ID części w Part-DB.
+- The **"Select all"** checkbox selects / deselects the whole list.
+- Each item shows the part name and its Part-DB ID.
 
-### Dialog potwierdzenia
+### Confirmation dialog
 
-Przed wysłaniem pojawia się dialog z podglądem przypisań:
+Before sending, a dialog appears with a preview of the assignments:
 
 ```
-Nadaj IPN:
-  Kondensator 10µF  →  3 847 291
+Assign IPN:
+  Capacitor 10µF  →  3 847 291
   ...
 
-[Anuluj]  [Zatwierdź]
+[Cancel]  [Confirm]
 ```
 
-### Ekran wyników
+### Results screen
 
-Po zatwierdzeniu każda pozycja otrzymuje status:
+After confirming, each item gets a status:
 
-- **✅** – IPN nadany pomyślnie
-- **❌** – błąd (np. kolizja na serwerze, problem sieciowy)
-
----
-
-## Algorytm generowania IPN
-
-1. Aplikacja zbiera zbiór wszystkich **istniejących IPN** z pobranych części.
-2. Dla każdej zaznaczonej części losuje liczbę z zakresu `1 000 000 – 9 999 999`.
-3. Sprawdza kolizję zarówno z istniejącymi IPN, jak i z już wygenerowanymi w tej sesji.
-4. Powtarza losowanie do skutku (bez limitu iteracji – kolizje są skrajnie rzadkie).
+- **✅** – IPN assigned successfully
+- **❌** – error (e.g. a server-side collision, a network problem)
 
 ---
 
-## Szczegóły techniczne
+## IPN generation algorithm
 
-Nadanie IPN:
+1. The app collects the set of all **existing IPNs** from the fetched parts.
+2. For each selected part it draws a random number from the range `1,000,000 – 9,999,999`.
+3. It checks for collisions against both the existing IPNs and those already generated in this session.
+4. It re-draws until it succeeds (with no iteration limit – collisions are extremely rare).
+
+---
+
+## Technical details
+
+Assigning an IPN:
 ```
 PATCH /api/parts/{id}
 Content-Type: application/merge-patch+json
@@ -85,4 +85,4 @@ Content-Type: application/merge-patch+json
 { "ipn": "3847291" }
 ```
 
-Po zakończeniu sesji lista jest odświeżana automatycznie.
+After the session finishes, the list refreshes automatically.

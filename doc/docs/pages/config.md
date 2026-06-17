@@ -1,57 +1,57 @@
-# Konfiguracja
+# Configuration
 
-Ekran konfiguracji dostępny jest przez ostatnią zakładkę w dolnym pasku nawigacji (ikona koła zębatego).
+The configuration screen is available through the last tab in the bottom navigation bar (gear icon).
 
 ---
 
-## Ustawienia
+## Settings
 
-### Adres serwera
+### Server address
 
-Pole tekstowe z pełnym URL bazowym instancji Part-DB.
+A text field with the full base URL of the Part-DB instance.
 
 ```
 http://192.168.1.10:8000
 ```
 
-Wymagania:
-- Brak końcowego ukośnika
-- Bez ścieżki `/api` – dodawana automatycznie
-- HTTP lub HTTPS (certyfikat musi być zaufany przez system Android)
+Requirements:
+- No trailing slash
+- No `/api` path – it is added automatically
+- HTTP or HTTPS (the certificate must be trusted by the Android system)
 
-Wartość przechowywana w **Flutter Secure Storage** (klucz `partdb_base_url`).
+The value is stored in **Flutter Secure Storage** (key `partdb_base_url`).
 
-### Token API
+### API token
 
-Pole tekstowe lub skan kodów QR.
+A text field or a QR-code scan.
 
-- Przycisk **📷** otwiera skaner, który odczytuje token z kodu QR.
-- Przycisk **Sprawdź token** wykonuje żądanie `GET /api/tokens/current` i wyświetla login użytkownika lub komunikat błędu.
+- The **📷** button opens the scanner, which reads the token from a QR code.
+- The **Check token** button performs a `GET /api/tokens/current` request and shows the user login or an error message.
 
-Wartość przechowywana w **Flutter Secure Storage** (klucz `partdb_token`).
+The value is stored in **Flutter Secure Storage** (key `partdb_token`).
 
-### Zoom kamery
+### Camera zoom
 
-Suwak w zakresie **1.0× – 3.0×** (domyślnie: **2.0×**).
+A slider in the range **1.0× – 3.0×** (default: **2.0×**).
 
-Steruje wstępnym powiększeniem kamery w `BarcodeScanPage`. Wyższa wartość przydatna przy skanowaniu małych kodów Data Matrix na szpulach SMD.
+It controls the initial camera magnification in `BarcodeScanPage`. A higher value is useful when scanning small Data Matrix codes on SMD reels.
 
-Wartość przechowywana w **Flutter Secure Storage** (klucz `camera_zoom`).
-
----
-
-## Informacje o aplikacji
-
-Sekcja na dole ekranu wyświetla:
-
-- **Wersja aplikacji** – pobierana przez `package_info_plus`
-- **Wersja Flutter SDK**
+The value is stored in **Flutter Secure Storage** (key `camera_zoom`).
 
 ---
 
-## Przechowywanie danych
+## App information
 
-Wszystkie dane konfiguracyjne szyfrowane są kluczem sprzętowym (Android Keystore) przez `flutter_secure_storage`. Dostęp do nich mają wyłącznie procesy tej aplikacji.
+The section at the bottom of the screen shows:
 
-!!! info "Odinstalowanie aplikacji"
-    Odinstalowanie aplikacji usuwa wszystkie dane z Secure Storage. Ponowna instalacja wymaga wpisania tokenu i adresu serwera od nowa.
+- **App version** – fetched via `package_info_plus`
+- **Flutter SDK version**
+
+---
+
+## Data storage
+
+All configuration data is encrypted with a hardware key (Android Keystore) through `flutter_secure_storage`. Only this app's processes can access it.
+
+!!! info "Uninstalling the app"
+    Uninstalling the app removes all data from Secure Storage. Reinstalling requires entering the token and server address again.

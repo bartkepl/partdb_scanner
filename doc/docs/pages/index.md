@@ -1,39 +1,39 @@
-# Ekrany aplikacji
+# App screens
 
-Aplikacja zbudowana jest wokół czterech głównych zakładek dostępnych z dolnego paska nawigacji:
+The app is built around four main tabs available from the bottom navigation bar:
 
-| Ikona | Zakładka | Opis |
-|-------|----------|------|
-| Lupa | **Wyszukiwanie** | Główny ekran – szukanie, skanowanie, lista wyników |
-| Magiczna różdżka | **Generator IPN** | Masowe nadawanie identyfikatorów IPN |
-| Drzewo | **Kategorie** | Hierarchiczne przeglądanie kategorii |
-| Koło zębate | **Konfiguracja** | Ustawienia serwera, tokenu i kamery |
+| Icon | Tab | Description |
+|------|-----|-------------|
+| Magnifier | **Search** | Main screen – search, scan, results list |
+| Magic wand | **IPN generator** | Bulk-assign IPN identifiers |
+| Tree | **Categories** | Hierarchical category browsing |
+| Gear | **Configuration** | Server, token and camera settings |
 
-Ikona ostrzegawcza (badge) przy zakładce wyszukiwania sygnalizuje, że co najmniej jedna część ma stan niższy niż minimum.
+A warning badge on the search tab signals that at least one part is below its minimum stock.
 
 ---
 
-## Przegląd ekranów
+## Screen overview
 
 ```mermaid
 graph LR
-    A[Wyszukiwanie] -->|wybór części| B[Szczegóły części]
-    A -->|skan| C[Skaner kodów]
-    A -->|inwentaryzacja| D[Inwentaryzacja]
-    B -->|drukarka| E[Drukowanie etykiet]
-    F[Kategorie] -->|drill-down| G[Lista w kategorii]
-    G -->|wybór| B
-    H[Konfiguracja] -->|skan tokenu| C
+    A[Search] -->|select a part| B[Part details]
+    A -->|scan| C[Barcode scanner]
+    A -->|stock taking| D[Stock taking]
+    B -->|printer| E[Label printing]
+    F[Categories] -->|drill-down| G[List in category]
+    G -->|select| B
+    H[Configuration] -->|scan token| C
 ```
 
 ---
 
-## Szczegółowe opisy
+## Detailed descriptions
 
-- [Wyszukiwanie](search.md) – wyszukiwanie, skanowanie, historia, eksport CSV
-- [Szczegóły części](part-detail.md) – stany, parametry, drukowanie, zdjęcia
-- [Przeglądarka kategorii](category-browser.md) – drzewo, drill-down
-- [Generator IPN](ipn-generator.md) – losowanie i przypisywanie IPN
-- [Inwentaryzacja](stock-taking.md) – skanowanie + korekty stanów
-- [Drukowanie etykiet](label-print.md) – Niimbot D101, typy etykiet
-- [Konfiguracja](config.md) – serwer, token, zoom
+- [Search](search.md) – searching, scanning, history, CSV export
+- [Part details](part-detail.md) – stock, parameters, printing, photos
+- [Category browser](category-browser.md) – tree, drill-down
+- [IPN generator](ipn-generator.md) – generating and assigning IPNs
+- [Stock taking](stock-taking.md) – scanning + stock corrections
+- [Label printing](label-print.md) – Niimbot D101, label types
+- [Configuration](config.md) – server, token, zoom

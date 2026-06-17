@@ -1,42 +1,42 @@
-# Architektura aplikacji
+# App architecture
 
-## Struktura projektu
+## Project structure
 
 ```
 lib/
-├── main.dart                  # Punkt wejścia, konfiguracja motywu, bottom nav
+├── main.dart                  # Entry point, theme config, bottom nav
 ├── models/
 │   ├── part.dart              # Part, PartLot, PartParameter
-│   ├── api_exception.dart     # Wyjątek API z kodem HTTP
-│   └── label_config.dart      # Konfiguracja etykiet Niimbot
+│   ├── api_exception.dart     # API exception with HTTP code
+│   └── label_config.dart      # Niimbot label configuration
 ├── pages/
-│   ├── search_page.dart       # Główny ekran wyszukiwania
-│   ├── barcode_scan_page.dart # Kamera + ML Kit
-│   ├── part_detail_page.dart  # Szczegóły i edycja części
-│   ├── ipn_generator_page.dart# Generator IPN
-│   ├── category_browser_page.dart # Drzewo kategorii
-│   ├── config_page.dart       # Konfiguracja serwera
-│   ├── label_print_page.dart  # Drukowanie Niimbot
-│   └── stock_taking_page.dart # Inwentaryzacja
+│   ├── search_page.dart       # Main search screen
+│   ├── barcode_scan_page.dart # Camera + ML Kit
+│   ├── part_detail_page.dart  # Part details and editing
+│   ├── ipn_generator_page.dart# IPN generator
+│   ├── category_browser_page.dart # Category tree
+│   ├── config_page.dart       # Server configuration
+│   ├── label_print_page.dart  # Niimbot printing
+│   └── stock_taking_page.dart # Stock taking
 └── services/
-    ├── api_service.dart        # Klient REST Part-DB
-    ├── history_service.dart    # Historia ostatnio oglądanych
-    ├── export_service.dart     # Eksport CSV
-    ├── printer_service.dart    # Drukarka Sunmi
-    ├── printer_controller.dart # Abstrakcja Sunmi
-    └── niimbot_service.dart    # Drukarka Niimbot D101
+    ├── api_service.dart        # Part-DB REST client
+    ├── history_service.dart    # Recently viewed history
+    ├── export_service.dart     # CSV export
+    ├── printer_service.dart    # Sunmi printer
+    ├── printer_controller.dart # Sunmi abstraction
+    └── niimbot_service.dart    # Niimbot D101 printer
 ```
 
 ---
 
-## Wzorzec architektoniczny
+## Architectural pattern
 
-Aplikacja używa wzorca **Provider** do zarządzania stanem i wstrzykiwania zależności.
+The app uses the **Provider** pattern for state management and dependency injection.
 
 ```
 main.dart
 └── MultiProvider
-    └── Provider<ApiService>        # Singleton klienta API
+    └── Provider<ApiService>        # API client singleton
         └── MaterialApp
             └── HomePage (StatefulWidget)
                 └── BottomNavigationBar
@@ -46,11 +46,11 @@ main.dart
                     └── ConfigPage
 ```
 
-Każdy ekran jest niezależnym `StatefulWidget` i odczytuje `ApiService` z kontekstu przez `Provider.of<ApiService>(context)`.
+Each screen is an independent `StatefulWidget` and reads `ApiService` from the context through `Provider.of<ApiService>(context)`.
 
 ---
 
-## Graf nawigacji
+## Navigation graph
 
 ```mermaid
 graph TD
@@ -79,106 +79,106 @@ graph TD
 ```
 
 !!! note
-    `BarcodeScanPage` zwraca wynik przez `Navigator.pop(context, result)`. Wywoływana jest z trzech różnych miejsc z różnymi kontekstami użycia (wyszukiwanie IPN, skanowanie tokenu, skanowanie w inwentaryzacji).
+    `BarcodeScanPage` returns its result via `Navigator.pop(context, result)`. It is called from three different places with different use contexts (IPN search, token scanning, stock-taking scanning).
 
 ---
 
-## Przepływ danych
+## Data flow
 
 ```mermaid
 sequenceDiagram
-    participant U as Użytkownik
+    participant U as User
     participant P as SearchPage
     participant A as ApiService
     participant S as Part-DB Server
 
-    U->>P: wpisuje zapytanie
+    U->>P: types a query
     P->>A: searchParts(query)
     A->>S: GET /api/parts?name={query}
     S-->>A: [{id, name, ipn, ...}]
     A-->>P: List<Part>
-    P->>U: wyświetla listę
+    P->>U: shows the list
 
-    U->>P: wybiera część
+    U->>P: selects a part
     P->>A: fetchPartById(id)
     A->>S: GET /api/parts/{id}
     S-->>A: {parameters[], partLots[], ...}
-    A-->>P: Part (pełny)
+    A-->>P: Part (complete)
     P->>U: PartDetailPage
 ```
 
 ---
 
-## Serwisy
+## Services
 
 ### ApiService
 
-Centralny klient HTTP dla Part-DB API. Przechowuje konfigurację (URL, token) w **Flutter Secure Storage** – dane są zaszyfrowane kluczem sprzętowym Android Keystore.
+The central HTTP client for the Part-DB API. It keeps the configuration (URL, token) in **Flutter Secure Storage** – the data is encrypted with a hardware key in the Android Keystore.
 
-Kluczowe metody:
+Key methods:
 
-| Metoda | Opis |
-|--------|------|
-| `searchParts(query)` | Wyszukiwanie wielotryb (IPN, nazwa, parametr, wartość, auto) |
-| `fetchPartById(id)` | Pełne dane części z parametrami i partiami |
-| `fetchAllParts()` | Stronicowany pobór wszystkich części (max 2000) |
-| `patchPartLot(id, amount)` | Aktualizacja ilości w lokalizacji |
-| `patchPartParameter(id, value)` | Aktualizacja wartości parametru |
-| `patchPartIpn(id, ipn)` | Nadanie IPN do części |
-| `fetchCategories()` | Drzewo kategorii (max 200, paginacja) |
-| `uploadAttachment(partId, bytes)` | Przesłanie zdjęcia jako base64 |
+| Method | Description |
+|--------|-------------|
+| `searchParts(query)` | Multi-mode search (IPN, name, parameter, value, auto) |
+| `fetchPartById(id)` | Full part data with parameters and lots |
+| `fetchAllParts()` | Paginated fetch of all parts (max 2000) |
+| `patchPartLot(id, amount)` | Update the quantity at a location |
+| `patchPartParameter(id, value)` | Update a parameter value |
+| `patchPartIpn(id, ipn)` | Assign an IPN to a part |
+| `fetchCategories()` | Category tree (max 200, paginated) |
+| `uploadAttachment(partId, bytes)` | Upload a photo as base64 |
 
-Timeout standardowy: **10 s**, dla uploadu pliku: **30 s**.
+Standard timeout: **10 s**, for file upload: **30 s**.
 
 ### HistoryService
 
-Przechowuje ostatnie **20** przeglądanych części w `SharedPreferences` jako JSON. Używany przez `SearchPage` do wyświetlenia historii przy pustym polu wyszukiwania.
+Stores the last **20** viewed parts in `SharedPreferences` as JSON. Used by `SearchPage` to show history when the search field is empty.
 
 ### ExportService
 
-Generuje plik CSV z wyników wyszukiwania (ID, IPN, Nazwa, Stan, Min, Kategoria, Producent, Opis) i udostępnia go przez natywny dialog `share_plus`.
+Generates a CSV file from the search results (ID, IPN, Name, Stock, Min, Category, Manufacturer, Description) and shares it through the native `share_plus` dialog.
 
 ### NiimbotService
 
-Generuje bitmapy etykiet za pomocą `dart:ui` Canvas API i przesyła je przez Bluetooth do drukarki Niimbot D101. Obsługuje trzy typy etykiet: szufladkową (22×14 mm) i dwa warianty szpulowe (12×40 mm).
+Generates label bitmaps using the `dart:ui` Canvas API and sends them over Bluetooth to the Niimbot D101 printer. Supports three label types: drawer (22×14 mm) and two reel variants (12×40 mm).
 
 ### PrinterService / PrinterController
 
-Abstrakcja nad `SunmiPrinterPlus` do drukowania paragonów termicznych na urządzeniach Sunmi. Formatuje dane części (nazwa, IPN, parametry, lokalizacje, kod QR).
+An abstraction over `SunmiPrinterPlus` for printing thermal receipts on Sunmi devices. It formats the part data (name, IPN, parameters, locations, QR code).
 
 ---
 
-## Przechowywanie danych lokalnych
+## Local data storage
 
-| Dane | Mechanizm | Klucz |
-|------|-----------|-------|
-| Adres serwera | Flutter Secure Storage | `partdb_base_url` |
-| Token API | Flutter Secure Storage | `partdb_token` |
-| Zoom kamery | Flutter Secure Storage | `camera_zoom` |
-| Historia części | SharedPreferences (JSON) | `part_history` |
-| Konfiguracja etykiet | SharedPreferences (JSON) | `niimbot_label_params` |
-
----
-
-## Motyw
-
-Material 3, tryb ciemny, kolor dominujący: **Deep Orange** (`#FF9800`). Tryb ciemny jest domyślny i jedyny dostępny (`ThemeMode.dark`).
+| Data | Mechanism | Key |
+|------|-----------|-----|
+| Server address | Flutter Secure Storage | `partdb_base_url` |
+| API token | Flutter Secure Storage | `partdb_token` |
+| Camera zoom | Flutter Secure Storage | `camera_zoom` |
+| Part history | SharedPreferences (JSON) | `part_history` |
+| Label configuration | SharedPreferences (JSON) | `niimbot_label_params` |
 
 ---
 
-## Zależności kluczowe
+## Theme
 
-| Pakiet | Wersja | Rola |
-|--------|--------|------|
-| `flutter` | SDK ^3.9.2 | Framework UI |
-| `provider` | ^6.0.5 | Wstrzykiwanie zależności / state management |
-| `http` | ^1.2.2 | Klient REST |
-| `flutter_secure_storage` | ^10.0.0 | Szyfrowane przechowywanie tokenu |
-| `shared_preferences` | ^2.2.3 | Lokalna historia i konfiguracja |
-| `camera` | ^0.11.0+2 | Podgląd kamery |
-| `google_mlkit_barcode_scanning` | ^0.14.2 | Detekcja kodów kreskowych |
-| `niim_blue_flutter` | ^1.0.0 | Drukarka Niimbot (Bluetooth) |
-| `sunmi_printer_plus` | ^4.1.1 | Drukarka Sunmi |
-| `barcode` | 2.2.9 | Generowanie Data Matrix / Code128 |
-| `share_plus` | ^10.1.2 | Eksport CSV |
-| `image_picker` | ^1.1.2 | Wybór zdjęcia do załącznika |
+Material 3, dark mode, primary color: **Deep Orange** (`#FF9800`). Dark mode is the default and the only available option (`ThemeMode.dark`).
+
+---
+
+## Key dependencies
+
+| Package | Version | Role |
+|---------|---------|------|
+| `flutter` | SDK ^3.9.2 | UI framework |
+| `provider` | ^6.0.5 | Dependency injection / state management |
+| `http` | ^1.2.2 | REST client |
+| `flutter_secure_storage` | ^10.0.0 | Encrypted token storage |
+| `shared_preferences` | ^2.2.3 | Local history and configuration |
+| `camera` | ^0.11.0+2 | Camera preview |
+| `google_mlkit_barcode_scanning` | ^0.14.2 | Barcode detection |
+| `niim_blue_flutter` | ^1.0.0 | Niimbot printer (Bluetooth) |
+| `sunmi_printer_plus` | ^4.1.1 | Sunmi printer |
+| `barcode` | 2.2.9 | Data Matrix / Code128 generation |
+| `share_plus` | ^10.1.2 | CSV export |
+| `image_picker` | ^1.1.2 | Photo selection for attachments |

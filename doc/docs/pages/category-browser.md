@@ -1,48 +1,48 @@
-# Przeglądarka kategorii
+# Category browser
 
-Ekran **Kategorie** pozwala przeglądać hierarchię kategorii Part-DB w formie drzewa i przechodzić do listy części należących do wybranej kategorii.
+The **Categories** screen lets you browse the Part-DB category hierarchy as a tree and drill down to the list of parts in a selected category.
 
 ---
 
-## Interfejs drzewa
+## Tree interface
 
 ```
-▶ Kondensatory
-▼ Rezystory
+▶ Capacitors
+▼ Resistors
     ▶ SMD
     ▼ THT
         ─ 1/4W
         ─ 1/2W
-▶ Półprzewodniki
+▶ Semiconductors
 ```
 
-- **▶** – kategoria zwinięta; kliknij, aby rozwinąć
-- **▼** – kategoria rozwinięta; kliknij strzałkę, aby zwinąć
-- **─** – kategoria bez podkategorii; kliknij nazwę, aby zobaczyć części
+- **▶** – collapsed category; tap to expand
+- **▼** – expanded category; tap the arrow to collapse
+- **─** – category with no subcategories; tap the name to see its parts
 
-Kliknięcie **nazwy kategorii** (nie strzałki) przechodzi do listy części w tej kategorii.
-
----
-
-## Lista części w kategorii
-
-Ekran `_CategoryPartsPage` wyświetla:
-
-- Wszystkie części przypisane bezpośrednio do wybranej kategorii
-- Sortowanie alfabetyczne po nazwie
-- Ikona ⚠ przy częściach z niskim stanem
-- Kliknięcie pozycji otwiera [Szczegóły części](part-detail.md)
-
-!!! note "Ładowanie kategorii"
-    Wszystkie kategorie pobierane są jednorazowo przy pierwszym wejściu na zakładkę (max 200 wpisów, paginacja Hydra). Kategorie są cache'owane w pamięci na czas sesji.
+Tapping a **category name** (not the arrow) opens the list of parts in that category.
 
 ---
 
-## Szczegóły techniczne
+## Parts list in a category
 
-Kategorie pobierane są przez:
+The `_CategoryPartsPage` screen shows:
+
+- All parts assigned directly to the selected category
+- Alphabetical sorting by name
+- A ⚠ icon next to low-stock parts
+- Tapping an item opens the [Part details](part-detail.md)
+
+!!! note "Loading categories"
+    All categories are fetched once on first entry to the tab (max 200 entries, Hydra pagination). The categories are cached in memory for the session.
+
+---
+
+## Technical details
+
+Categories are fetched through:
 ```
 GET /api/categories?itemsPerPage=200
 ```
 
-Aplikacja śledzi, które węzły drzewa są rozwinięte (`Set<int> _expandedIds`) i renderuje listę rekurencyjnie. Każdy poziom wcięcia o 16 px w lewo.
+The app tracks which tree nodes are expanded (`Set<int> _expandedIds`) and renders the list recursively. Each indentation level is offset by 16 px.

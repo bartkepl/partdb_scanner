@@ -1,118 +1,118 @@
-# Pierwsze kroki
+# Getting started
 
-## Wymagania wstępne
+## Prerequisites
 
-### Serwer Part-DB
+### Part-DB server
 
-Aplikacja wymaga działającej instancji **Part-DB** dostępnej w tej samej sieci co urządzenie mobilne.
+The app requires a running **Part-DB** instance reachable on the same network as the mobile device.
 
-- Dokumentacja Part-DB: [https://docs.part-db.de](https://docs.part-db.de)
-- Minimalna wersja Part-DB: z aktywnym REST API (Hydra/JSON-LD)
-- Serwer musi być dostępny pod stałym adresem IP lub nazwą hosta
+- Part-DB documentation: [https://docs.part-db.de](https://docs.part-db.de)
+- Minimum Part-DB version: any version with the REST API enabled (Hydra/JSON-LD)
+- The server must be reachable at a fixed IP address or hostname
 
-!!! tip "Lokalna sieć domowa"
-    Wystarczy serwer działający na domowym NAS lub komputerze (np. przez Docker).
-    Telefon i serwer muszą być w tej samej sieci Wi-Fi.
-
----
-
-## Generowanie tokenu API
-
-1. Zaloguj się do panelu Part-DB w przeglądarce.
-2. Przejdź do **Ustawienia użytkownika → Tokeny API**.
-3. Kliknij **Utwórz nowy token**, nadaj mu nazwę (np. `scanner`).
-4. Skopiuj wygenerowany token – będzie potrzebny w kroku konfiguracji.
-
-!!! warning "Uprawnienia tokenu"
-    Token musi mieć uprawnienia do odczytu i zapisu części, partii, parametrów oraz załączników.
-    Jeśli chcesz tylko przeglądać – wystarczy uprawnienie tylko do odczytu.
+!!! tip "Local home network"
+    A server running on a home NAS or computer (e.g. via Docker) is enough.
+    The phone and the server must be on the same Wi-Fi network.
 
 ---
 
-## Konfiguracja aplikacji
+## Generating an API token
 
-Po uruchomieniu aplikacji przejdź na ostatnią zakładkę (ikona koła zębatego) – **Konfiguracja**.
+1. Sign in to the Part-DB panel in your browser.
+2. Go to **User settings → API tokens**.
+3. Click **Create new token** and give it a name (e.g. `scanner`).
+4. Copy the generated token – you will need it during configuration.
 
-### 1. Adres serwera
+!!! warning "Token permissions"
+    The token needs read and write permissions for parts, lots, parameters and attachments.
+    If you only want to browse, read-only permission is enough.
 
-Wpisz pełny adres bazowy serwera Part-DB, np.:
+---
+
+## Configuring the app
+
+After launching the app, open the last tab (gear icon) – **Configuration**.
+
+### 1. Server address
+
+Enter the full base address of the Part-DB server, e.g.:
 
 ```
 http://192.168.1.10:8000
 ```
 
-lub przez HTTPS:
+or over HTTPS:
 
 ```
-https://partdb.moja-domena.local
+https://partdb.my-domain.local
 ```
 
 !!! note
-    Nie dodawaj `/api` na końcu – aplikacja sama dopisuje ścieżki API.
+    Do not add `/api` at the end – the app appends the API paths itself.
 
-### 2. Token API
+### 2. API token
 
-Wklej token skopiowany z Part-DB lub skorzystaj z przycisku skanowania, aby zeskanować token QR kodem kreskowym.
+Paste the token copied from Part-DB, or use the scan button to read a token from a QR/barcode.
 
-Po wpisaniu tokenu kliknij **Sprawdź token** – aplikacja połączy się z serwerem i wyświetli informację o zalogowanym użytkowniku.
+After entering the token tap **Check token** – the app connects to the server and shows information about the signed-in user.
 
-### 3. Powiększenie kamery
+### 3. Camera zoom
 
-Suwak **Zoom kamery** (1.0× – 3.0×, domyślnie 2.0×) steruje powiększeniem podglądu podczas skanowania kodów kreskowych. Ustaw większą wartość dla małych kodów Data Matrix na szpulach SMD.
+The **Camera zoom** slider (1.0× – 3.0×, default 2.0×) controls the preview magnification while scanning barcodes. Set a higher value for small Data Matrix codes on SMD reels.
 
 ---
 
-## Uprawnienia Android
+## Android permissions
 
-Przy pierwszym uruchomieniu aplikacja poprosi o następujące uprawnienia:
+On first launch the app asks for the following permissions:
 
-| Uprawnienie | Do czego |
-|-------------|----------|
-| **Kamera** | Skanowanie kodów kreskowych i fotografowanie części |
-| **Bluetooth** | Drukowanie na Niimbot D101 |
-| **Pamięć** | Tymczasowy zapis pliku CSV przy eksporcie |
+| Permission | Used for |
+|------------|----------|
+| **Camera** | Scanning barcodes and photographing parts |
+| **Bluetooth** | Printing on the Niimbot D101 |
+| **Storage** | Temporary CSV file storage during export |
 
 !!! info
-    Na Androidzie 12+ Bluetooth wymaga uprawnień `BLUETOOTH_CONNECT` i `BLUETOOTH_SCAN`. Jeśli drukarka nie pojawia się na liście, sprawdź czy Bluetooth jest włączony i czy aplikacja ma wymagane uprawnienia w ustawieniach systemowych.
+    On Android 12+ Bluetooth requires the `BLUETOOTH_CONNECT` and `BLUETOOTH_SCAN` permissions. If the printer does not appear in the list, check that Bluetooth is enabled and that the app has the required permissions in system settings.
 
 ---
 
-## Weryfikacja połączenia
+## Verifying the connection
 
-Po konfiguracji:
+After configuration:
 
-1. Przejdź na zakładkę **Wyszukiwanie**.
-2. Wpisz dowolną nazwę komponentu lub zeskanuj kod kreskowy.
-3. Jeśli pojawią się wyniki – aplikacja jest poprawnie skonfigurowana.
+1. Switch to the **Search** tab.
+2. Type any component name or scan a barcode.
+3. If results appear – the app is configured correctly.
 
-Jeśli pojawi się błąd:
+If an error appears:
 
-| Komunikat | Przyczyna | Rozwiązanie |
-|-----------|-----------|-------------|
-| `Connection refused` | Serwer niedostępny lub zły port | Sprawdź adres i port, ping z sieci Wi-Fi |
-| `401 Unauthorized` | Zły lub wygasły token | Wygeneruj nowy token w Part-DB |
-| `Timeout` | Serwer zbyt wolny lub brak zasięgu sieci | Sprawdź Wi-Fi, zwiększ limit czasu po stronie serwera |
-| `SSL handshake failed` | Certyfikat HTTPS niezaufany | Użyj HTTP lub zainstaluj certyfikat CA |
+| Message | Cause | Solution |
+|---------|-------|----------|
+| `Connection refused` | Server unreachable or wrong port | Check the address and port, ping it from the Wi-Fi network |
+| `401 Unauthorized` | Wrong or expired token | Generate a new token in Part-DB |
+| `Timeout` | Server too slow or no network coverage | Check Wi-Fi, raise the server-side time limit |
+| `SSL handshake failed` | Untrusted HTTPS certificate | Use HTTP or install the CA certificate |
 
 ---
 
-## Pierwsze użycie
+## First use
 
-### Skanowanie komponentu
+### Scanning a component
 
-1. Kliknij ikonę skanera (prawy górny róg ekranu Wyszukiwanie).
-2. Skieruj kamerę na kod Data Matrix lub QR na szpuli lub opakowaniu.
-3. Jeśli kod zawiera 7-cyfrowy IPN – aplikacja otworzy bezpośrednio szczegóły części.
-4. Dla innych kodów – aplikacja wykona wyszukiwanie pełnotekstowe.
+1. Tap the scanner icon (top-right of the Search screen).
+2. Point the camera at the Data Matrix or QR code on the reel or package.
+3. If the code contains a 7-digit IPN – the app opens the part details directly.
+4. For other codes – the app runs a full-text search.
 
-### Szybka korekta stanu
+### Quick stock adjustment
 
-Dla części z jedną lokalizacją magazynową przy wyniku wyszukiwania pojawi się przycisk szybkiej korekty (+/−). Nie ma potrzeby otwierać szczegółów.
+For parts with a single storage location, a quick-adjust button (+/−) appears next to the search result. There is no need to open the details.
 
-### Drukowanie etykiety
+### Printing a label
 
-1. Otwórz szczegóły części.
-2. Kliknij ikonę drukarki.
-3. Wybierz typ etykiety (szufladkowa lub szpulowa).
-4. Sparuj drukarkę Niimbot D101 przez Bluetooth, jeśli nie jest jeszcze sparowana.
-5. Wyślij wydruk.
+1. Open the part details.
+2. Tap the printer icon.
+3. Choose the label type (drawer or reel).
+4. Pair the Niimbot D101 printer over Bluetooth if it is not paired yet.
+5. Send the print job.

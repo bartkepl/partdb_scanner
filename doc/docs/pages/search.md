@@ -1,125 +1,125 @@
-# Wyszukiwanie
+# Search
 
-Ekran wyszukiwania to główny interfejs aplikacji. Dostępny jest natychmiast po uruchomieniu.
+The search screen is the app's main interface. It is available immediately after launch.
 
 ---
 
-## Interfejs
+## Interface
 
 ```
 ┌─────────────────────────────────────────┐
-│  [Pole wyszukiwania]        [🔍] [📷]  │
-│  [Filtr kategorii ▼]  [↕ Sortowanie]   │
-│  [☑ Tylko niski stan]                  │
+│  [Search field]            [🔍] [📷]   │
+│  [Category filter ▼]  [↕ Sorting]      │
+│  [☑ Low stock only]                    │
 ├─────────────────────────────────────────┤
-│  • Rezystor 10k                 12 szt  │
+│  • Resistor 10k                 12 pcs  │
 │    IPN: 1234567                 📦 A3   │
-│    ──── Szybka korekta: [−][10][+]──── │
+│    ──── Quick adjust: [−][10][+]────── │
 │                                        │
-│  • Kondensator 100nF             0 szt  │
-│    IPN: 7654321          ⚠ Niski stan  │
+│  • Capacitor 100nF               0 pcs  │
+│    IPN: 7654321            ⚠ Low stock │
 └─────────────────────────────────────────┘
 ```
 
 ---
 
-## Tryby wyszukiwania
+## Search modes
 
-Wybierany z górnego menu (domyślnie: **Auto**):
+Selected from the top menu (default: **Auto**):
 
-| Tryb | Zachowanie |
-|------|------------|
-| **Auto** | Najpierw szuka po nazwie; jeśli zero wyników – szuka po parametrach |
-| **IPN** | Dokładne dopasowanie 7-cyfrowego kodu IPN |
-| **Nazwa** | Wyszukiwanie po nazwie części (`/api/parts?name=`) |
-| **Parametr** | Szuka po nazwie parametru (np. „Rezystancja") |
-| **Wartość** | Szuka po wartości parametru (np. „10k") |
+| Mode | Behavior |
+|------|----------|
+| **Auto** | Searches by name first; if there are zero results – searches by parameters |
+| **IPN** | Exact match of a 7-digit IPN code |
+| **Name** | Search by part name (`/api/parts?name=`) |
+| **Parameter** | Searches by parameter name (e.g. "Resistance") |
+| **Value** | Searches by parameter value (e.g. "10k") |
 
-!!! tip "IPN a skaner"
-    Kiedy z skanera wraca dokładnie 7 cyfr, aplikacja automatycznie ustawia tryb IPN i otwiera modal **szybkiej korekty** zamiast listy wyników.
-
----
-
-## Filtry i sortowanie
-
-### Filtr kategorii
-
-Rozwijana lista wszystkich kategorii z Part-DB. Ogranicza wyniki do wybranej kategorii.
-
-### Filtr niskiego stanu
-
-Przełącznik **„Tylko niski stan"** – pokazuje tylko części, gdzie `totalStock < minAmount` (i `minAmount > 0`).
-
-### Sortowanie
-
-Dostępne opcje (przycisk `↕`):
-
-- Nazwa A→Z (domyślne)
-- Nazwa Z→A
-- Stan rosnąco
-- Stan malejąco
+!!! tip "IPN and the scanner"
+    When the scanner returns exactly 7 digits, the app automatically sets IPN mode and opens the **quick adjust** modal instead of a results list.
 
 ---
 
-## Historia
+## Filters and sorting
 
-Gdy pole wyszukiwania jest **puste**, zamiast listy wyników wyświetlane są ostatnie **20 przeglądanych części** (z HistoryService). Wpis dodawany jest automatycznie przy każdym otwarciu `PartDetailPage`.
+### Category filter
+
+A dropdown of all categories from Part-DB. Limits results to the selected category.
+
+### Low stock filter
+
+The **"Low stock only"** toggle – shows only parts where `totalStock < minAmount` (and `minAmount > 0`).
+
+### Sorting
+
+Available options (the `↕` button):
+
+- Name A→Z (default)
+- Name Z→A
+- Stock ascending
+- Stock descending
 
 ---
 
-## Szybka korekta stanu
+## History
 
-Widoczna przy pozycjach listy dla części z **dokładnie jedną lokalizacją** magazynową:
+When the search field is **empty**, instead of a results list the app shows the last **20 viewed parts** (from HistoryService). An entry is added automatically every time `PartDetailPage` is opened.
+
+---
+
+## Quick stock adjustment
+
+Visible on list items for parts with **exactly one** storage location:
 
 ```
-[−]  [pole ilości]  [+]  [💬]  [✓]
+[−]  [quantity field]  [+]  [💬]  [✓]
 ```
 
-- **`−` / `+`** – zmiana o 1 w dół / górę
-- **Pole ilości** – bezpośrednie wpisanie liczby
-- **`💬`** – opcjonalny komentarz (zapisywany w polu `description` partii)
-- **`✓`** – zatwierdzenie i wysłanie PATCH do serwera
+- **`−` / `+`** – change by 1 down / up
+- **Quantity field** – type a number directly
+- **`💬`** – optional comment (saved in the lot's `description` field)
+- **`✓`** – confirm and send the PATCH to the server
 
-Dla części z wieloma lokalizacjami zamiast szybkiej korekty widoczny jest przycisk przechodzący do pełnych szczegółów.
-
----
-
-## Skanowanie kodów
-
-Ikona aparatu (prawy górny róg) otwiera [BarcodeScanPage](../architecture/index.md).
-
-Obsługiwane formaty:
-- **QR Code** i **Data Matrix** – typowe dla szpul SMD i własnych etykiet
-- **EAN-13** – kody producentów/dystrybutorów
-- **Code 128** – kody tekstowe
-
-Po zeskanowaniu:
-- 7 cyfr → tryb IPN, szybka korekta
-- pozostałe → wyszukiwanie pełnotekstowe
+For parts with multiple locations, a button that opens the full details is shown instead of the quick adjust.
 
 ---
 
-## Eksport CSV
+## Scanning codes
 
-Przycisk `⋮` (menu kontekstowe) → **Eksportuj CSV**.
+The camera icon (top-right) opens [BarcodeScanPage](../architecture/index.md).
 
-Eksportowane kolumny:
+Supported formats:
+- **QR Code** and **Data Matrix** – typical for SMD reels and custom labels
+- **EAN-13** – manufacturer/distributor codes
+- **Code 128** – text codes
 
-| Kolumna | Źródło |
-|---------|--------|
+After scanning:
+- 7 digits → IPN mode, quick adjust
+- anything else → full-text search
+
+---
+
+## CSV export
+
+The `⋮` button (context menu) → **Export CSV**.
+
+Exported columns:
+
+| Column | Source |
+|--------|--------|
 | ID | `part.id` |
 | IPN | `part.partNumber` |
-| Nazwa | `part.name` |
-| Stan | `part.totalStock` |
-| Min stan | `part.minAmount` |
-| Kategoria | `part.category` |
-| Producent | `part.manufacturer` |
-| Opis | `part.description` |
+| Name | `part.name` |
+| Stock | `part.totalStock` |
+| Min stock | `part.minAmount` |
+| Category | `part.category` |
+| Manufacturer | `part.manufacturer` |
+| Description | `part.description` |
 
-Plik otwierany jest w natywnym dialogu udostępniania Androida (Share+).
+The file opens in the native Android share dialog (Share+).
 
 ---
 
-## Inwentaryzacja
+## Stock taking
 
-Przycisk `⋮` → **Inwentaryzacja** otwiera dedykowany ekran [StockTakingPage](stock-taking.md).
+The `⋮` button → **Stock taking** opens the dedicated [StockTakingPage](stock-taking.md) screen.

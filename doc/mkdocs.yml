@@ -2,27 +2,27 @@ site_name: PartDB Scanner
 site_url: https://bartkepl.github.io/partdb_scanner/
 repo_url: https://github.com/bartkepl/partdb_scanner
 edit_uri: edit/main/doc/docs/
-site_description: Dokumentacja aplikacji mobilnej PartDB Scanner – skaner i menedżer komponentów elektronicznych
+site_description: Documentation for the PartDB Scanner mobile app – an electronic component scanner and inventory manager
 site_author: bartkepl
 docs_dir: docs
 site_dir: site
 
 theme:
   name: material
-  language: pl
+  language: en
   palette:
     - scheme: default
       primary: deep-orange
       accent: orange
       toggle:
         icon: material/brightness-7
-        name: Tryb ciemny
+        name: Dark mode
     - scheme: slate
       primary: deep-orange
       accent: orange
       toggle:
         icon: material/brightness-4
-        name: Tryb jasny
+        name: Light mode
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -37,6 +37,34 @@ theme:
 
 plugins:
   - search
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: pl
+          name: Polski
+          build: true
+          nav_translations:
+            Home: Strona główna
+            Getting started: Pierwsze kroki
+            Architecture: Architektura
+            Overview: Przegląd
+            Screens: Ekrany
+            Search: Wyszukiwanie
+            Part details: Szczegóły części
+            Category browser: Przeglądarka kategorii
+            IPN generator: Generator IPN
+            Stock taking: Inwentaryzacja
+            Label printing: Drukowanie etykiet
+            Configuration: Konfiguracja
+            REST API: API REST
+            Data models: Modele danych
 
 markdown_extensions:
   - admonition
@@ -64,18 +92,18 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - Strona główna: index.md
-  - Pierwsze kroki: getting-started.md
-  - Architektura:
-    - Przegląd: architecture/index.md
-  - Ekrany:
-    - Przegląd: pages/index.md
-    - Wyszukiwanie: pages/search.md
-    - Szczegóły części: pages/part-detail.md
-    - Przeglądarka kategorii: pages/category-browser.md
-    - Generator IPN: pages/ipn-generator.md
-    - Inwentaryzacja: pages/stock-taking.md
-    - Drukowanie etykiet: pages/label-print.md
-    - Konfiguracja: pages/config.md
-  - API REST: api.md
-  - Modele danych: models.md
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Architecture:
+    - Overview: architecture/index.md
+  - Screens:
+    - Overview: pages/index.md
+    - Search: pages/search.md
+    - Part details: pages/part-detail.md
+    - Category browser: pages/category-browser.md
+    - IPN generator: pages/ipn-generator.md
+    - Stock taking: pages/stock-taking.md
+    - Label printing: pages/label-print.md
+    - Configuration: pages/config.md
+  - REST API: api.md
+  - Data models: models.md

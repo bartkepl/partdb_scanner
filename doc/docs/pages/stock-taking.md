@@ -1,53 +1,53 @@
-# Inwentaryzacja
+# Stock taking
 
-Ekran **Inwentaryzacja** (`StockTakingPage`) umożliwia systematyczne przeliczanie stanów magazynowych przez skanowanie kodów IPN i wpisywanie aktualnych ilości.
+The **Stock taking** screen (`StockTakingPage`) lets you systematically recount stock levels by scanning IPN codes and entering the current quantities.
 
-Dostęp: ekran Wyszukiwanie → menu `⋮` → **Inwentaryzacja**.
-
----
-
-## Cel
-
-- Szybkie zliczanie fizycznych stanów bez otwierania każdej części osobno.
-- Wykrywanie rozbieżności między bazą a stanem rzeczywistym.
-- Zbiorczy zapis poprawek na koniec sesji.
+Access: Search screen → `⋮` menu → **Stock taking**.
 
 ---
 
-## Przebieg inwentaryzacji
+## Purpose
 
-### 1. Skanowanie lub wpisanie IPN
+- Quickly count physical stock without opening each part individually.
+- Detect discrepancies between the database and the actual stock.
+- Save all corrections in bulk at the end of the session.
 
-Pole IPN na górze ekranu + przycisk aparatu. Po zeskanowaniu/wpisaniu:
-- Aplikacja szuka części po tym IPN.
-- Jeśli znaleziona – dodaje pozycję do listy sesji.
-- Jeśli nie znaleziona – komunikat błędu.
+---
 
-### 2. Wpisanie aktualnej ilości
+## Stock-taking flow
 
-Dla każdej pozycji na liście:
+### 1. Scan or type an IPN
+
+The IPN field at the top of the screen plus a camera button. After scanning/typing:
+- The app searches for the part by that IPN.
+- If found – it adds the item to the session list.
+- If not found – an error message is shown.
+
+### 2. Enter the current quantity
+
+For each item on the list:
 ```
-Rezystor 10k  (IPN: 1234567)
-Lokalizacja: Szuflada A3
-Baza: 12 szt   Zliczone: [___]   [✓]
+Resistor 10k  (IPN: 1234567)
+Location: Drawer A3
+Database: 12 pcs   Counted: [___]   [✓]
 ```
 
-- Pole **Zliczone** – wpisz rzeczywistą ilość.
-- **✓** zatwierdza wartość i oznacza pozycję jako sprawdzoną.
+- The **Counted** field – type the actual quantity.
+- **✓** confirms the value and marks the item as checked.
 
-### 3. Rozbieżności
+### 3. Discrepancies
 
-Pozycje, gdzie `zliczone ≠ baza`, oznaczone są ikoną ⚠ i wyróżnieniem kolorystycznym.
+Items where `counted ≠ database` are marked with a ⚠ icon and color highlighting.
 
-### 4. Zapis
+### 4. Saving
 
-Przycisk **Zapisz wszystkie korekty** wysyła `PATCH /api/part_lots/{id}` dla każdej zmodyfikowanej pozycji.
+The **Save all corrections** button sends `PATCH /api/part_lots/{id}` for each modified item.
 
 ---
 
-## Stan sesji
+## Session state
 
-Sesja inwentaryzacyjna jest przechowywana tylko w pamięci (nie jest persystowana). Zamknięcie ekranu powoduje utratę niezapisanych zmian.
+The stock-taking session is held only in memory (it is not persisted). Closing the screen discards any unsaved changes.
 
 !!! warning
-    Zawsze zapisuj korekty przed opuszczeniem ekranu.
+    Always save your corrections before leaving the screen.

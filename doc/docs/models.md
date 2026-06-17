@@ -1,56 +1,56 @@
-# Modele danych
+# Data models
 
-Aplikacja używa kilku klas danych Dart do reprezentowania obiektów z Part-DB i lokalnej konfiguracji.
+The app uses several Dart data classes to represent objects from Part-DB and the local configuration.
 
 ---
 
 ## Part
 
-Główna klasa reprezentująca komponent elektroniczny.
+The main class representing an electronic component.
 
 ```dart
 class Part {
   final int id;
   final String name;
-  final String partNumber;   // IPN (7-cyfrowy identyfikator)
-  final String unit;         // jednostka miary (np. "pcs", "m")
-  final double minAmount;    // minimalny wymagany stan
+  final String partNumber;   // IPN (7-digit identifier)
+  final String unit;         // unit of measure (e.g. "pcs", "m")
+  final double minAmount;    // minimum required stock
   final String description;
   final String comment;
-  String category;           // nazwa kategorii (uzupełniana osobno)
-  String manufacturer;       // nazwa producenta (uzupełniana osobno)
+  String category;           // category name (filled in separately)
+  String manufacturer;       // manufacturer name (filled in separately)
   final String tags;
-  List<PartLot> partLots;    // lokalizacje magazynowe
+  List<PartLot> partLots;    // storage locations
   List<PartParameter> parameters;
 
-  // Pola obliczane
-  int get totalStock;        // suma amount ze wszystkich partLots
+  // Computed fields
+  int get totalStock;        // sum of amount across all partLots
   bool get isLowStock;       // totalStock < minAmount && minAmount > 0
 }
 ```
 
-| Pole | Typ | Opis |
-|------|-----|------|
-| `id` | `int` | Identyfikator w Part-DB |
-| `name` | `String` | Pełna nazwa części |
-| `partNumber` | `String` | IPN (może być pusty) |
-| `unit` | `String` | Jednostka miary |
-| `minAmount` | `double` | Minimalny wymagany stan |
-| `description` | `String` | Opis tekstowy |
-| `comment` | `String` | Komentarz wewnętrzny |
-| `category` | `String` | Nazwa kategorii (mutowalny, wypełniany po pobraniu) |
-| `manufacturer` | `String` | Nazwa producenta (mutowalny) |
-| `tags` | `String` | Tagi rozdzielone przecinkami |
-| `partLots` | `List<PartLot>` | Lokalizacje z ilościami |
-| `parameters` | `List<PartParameter>` | Parametry techniczne |
-| `totalStock` | `int` | Obliczony: suma ilości ze wszystkich `partLots` |
-| `isLowStock` | `bool` | Obliczony: `minAmount > 0 && totalStock < minAmount` |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `int` | Identifier in Part-DB |
+| `name` | `String` | Full part name |
+| `partNumber` | `String` | IPN (may be empty) |
+| `unit` | `String` | Unit of measure |
+| `minAmount` | `double` | Minimum required stock |
+| `description` | `String` | Text description |
+| `comment` | `String` | Internal comment |
+| `category` | `String` | Category name (mutable, filled in after fetching) |
+| `manufacturer` | `String` | Manufacturer name (mutable) |
+| `tags` | `String` | Comma-separated tags |
+| `partLots` | `List<PartLot>` | Locations with quantities |
+| `parameters` | `List<PartParameter>` | Technical parameters |
+| `totalStock` | `int` | Computed: sum of quantities across all `partLots` |
+| `isLowStock` | `bool` | Computed: `minAmount > 0 && totalStock < minAmount` |
 
 ---
 
 ## PartLot
 
-Reprezentuje partię magazynową – ilość w konkretnej lokalizacji.
+Represents a storage lot – a quantity at a specific location.
 
 ```dart
 class PartLot {
@@ -60,17 +60,17 @@ class PartLot {
 }
 ```
 
-| Pole | Typ | Opis |
-|------|-----|------|
-| `id` | `int` | Identyfikator partii w Part-DB |
-| `locationName` | `String` | Nazwa lokalizacji (szuflada, regał...) |
-| `amount` | `double` | Ilość w tej lokalizacji |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `int` | Lot identifier in Part-DB |
+| `locationName` | `String` | Location name (drawer, shelf…) |
+| `amount` | `double` | Quantity at this location |
 
 ---
 
 ## PartParameter
 
-Pojedynczy parametr techniczny części.
+A single technical parameter of a part.
 
 ```dart
 class PartParameter {
@@ -81,21 +81,21 @@ class PartParameter {
 }
 ```
 
-| Pole | Typ | Opis |
-|------|-----|------|
-| `id` | `int` | Identyfikator parametru w Part-DB |
-| `name` | `String` | Nazwa parametru (np. „Wartość", „Obudowa") |
-| `value` | `String` | Wartość tekstowa (parsowana z kilku możliwych pól API) |
-| `unit` | `String` | Jednostka (np. „Ω", „F", „V") |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `int` | Parameter identifier in Part-DB |
+| `name` | `String` | Parameter name (e.g. "Value", "Package") |
+| `value` | `String` | Text value (parsed from several possible API fields) |
+| `unit` | `String` | Unit (e.g. "Ω", "F", "V") |
 
-!!! note "Parsowanie wartości"
-    API Part-DB może zwrócić wartość parametru w polu `value`, `value_text` lub `formatted`. Aplikacja sprawdza kolejno każde z tych pól.
+!!! note "Value parsing"
+    The Part-DB API may return the parameter value in the `value`, `value_text` or `formatted` field. The app checks each of these fields in turn.
 
 ---
 
 ## ApiException
 
-Wyjątek rzucany przez `ApiService` przy błędzie HTTP lub parsowania.
+The exception thrown by `ApiService` on an HTTP or parsing error.
 
 ```dart
 class ApiException implements Exception {
@@ -104,42 +104,42 @@ class ApiException implements Exception {
 }
 ```
 
-Używany do wyświetlania szczegółowych komunikatów błędów w UI (SnackBar).
+Used to show detailed error messages in the UI (SnackBar).
 
 ---
 
 ## LabelConfig
 
-Konfiguracja parametrów etykiety Niimbot, persystowana przez `SharedPreferences`.
+Configuration of the Niimbot label parameters, persisted through `SharedPreferences`.
 
 ```dart
 class LabelConfig {
   List<LabelParamEntry> entries;
 
-  // Serializacja do/z JSON
-  // Zapis: SharedPreferences klucz 'niimbot_label_params'
+  // Serialization to/from JSON
+  // Storage: SharedPreferences key 'niimbot_label_params'
 }
 
 class LabelParamEntry {
-  final String name;   // nazwa parametru
-  bool enabled;        // czy drukować ten parametr
-  bool bold;           // czy pogrubiony
+  final String name;   // parameter name
+  bool enabled;        // whether to print this parameter
+  bool bold;           // whether it is bold
 }
 ```
 
-| Pole | Typ | Opis |
-|------|-----|------|
-| `name` | `String` | Nazwa parametru (musi pasować do `PartParameter.name`) |
-| `enabled` | `bool` | Czy parametr jest włączony na etykiecie |
-| `bold` | `bool` | Czy parametr drukowany jest pogrubioną czcionką |
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `String` | Parameter name (must match `PartParameter.name`) |
+| `enabled` | `bool` | Whether the parameter is enabled on the label |
+| `bold` | `bool` | Whether the parameter is printed in bold |
 
-`LabelConfig` implementuje logikę **scalania**: przy każdym otwarciu ekranu drukowania aktualna lista parametrów części jest łączona z zapisaną konfiguracją. Nowe parametry dodawane są na koniec jako włączone i niepogrubione; usunięte parametry są pomijane.
+`LabelConfig` implements **merge** logic: every time the print screen is opened, the current list of part parameters is merged with the saved configuration. New parameters are appended at the end as enabled and non-bold; removed parameters are skipped.
 
 ---
 
 ## HistoryEntry
 
-Wpis historii ostatnio oglądanych części. Przechowywany jako JSON w `SharedPreferences`.
+An entry in the history of recently viewed parts. Stored as JSON in `SharedPreferences`.
 
 ```dart
 class HistoryEntry {
@@ -149,4 +149,4 @@ class HistoryEntry {
 }
 ```
 
-Historia ograniczona jest do **20** ostatnich wpisów. Duplikaty (ten sam `id`) są usuwane przy dodawaniu nowego wpisu.
+The history is limited to the **20** most recent entries. Duplicates (the same `id`) are removed when a new entry is added.

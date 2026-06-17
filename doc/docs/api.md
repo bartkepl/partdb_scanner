@@ -1,50 +1,50 @@
-# API REST
+# REST API
 
-Aplikacja komunikuje się z serwerem Part-DB przez REST API w formacie **JSON-LD / Hydra**. Wszystkie żądania uwierzytelniane są tokenem Bearer.
+The app talks to the Part-DB server over a REST API in **JSON-LD / Hydra** format. Every request is authenticated with a Bearer token.
 
 ---
 
-## Uwierzytelnianie
+## Authentication
 
-Każde żądanie zawiera nagłówek:
+Each request includes the header:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-Token pobierany jest z Flutter Secure Storage przy każdym uruchomieniu aplikacji.
+The token is read from Flutter Secure Storage every time the app starts.
 
 ---
 
-## Wspólne parametry
+## Common parameters
 
-| Parametr | Opis |
-|----------|------|
-| `itemsPerPage` | Maksymalna liczba wyników na stronę (domyślnie 30 w Part-DB) |
-| `hydra:view` | Paginacja – zawiera `hydra:next` z URL do następnej strony |
-| `hydra:member` | Tablica wyników w odpowiedzi kolekcji |
-
----
-
-## Timeouty
-
-| Typ żądania | Timeout |
-|-------------|---------|
-| Standardowe (GET/PATCH) | **10 s** |
-| Upload załącznika (POST) | **30 s** |
+| Parameter | Description |
+|-----------|-------------|
+| `itemsPerPage` | Maximum number of results per page (default 30 in Part-DB) |
+| `hydra:view` | Pagination – contains `hydra:next` with the URL of the next page |
+| `hydra:member` | Array of results in a collection response |
 
 ---
 
-## Endpointy
+## Timeouts
 
-### Weryfikacja tokenu
+| Request type | Timeout |
+|--------------|---------|
+| Standard (GET/PATCH) | **10 s** |
+| Attachment upload (POST) | **30 s** |
+
+---
+
+## Endpoints
+
+### Token verification
 
 ```http
 GET /api/tokens/current
 Authorization: Bearer <token>
 ```
 
-**Odpowiedź 200:**
+**200 response:**
 ```json
 {
   "id": 5,
@@ -54,60 +54,60 @@ Authorization: Bearer <token>
 }
 ```
 
-Używane przez ekran [Konfiguracja](pages/config.md) do sprawdzenia poprawności tokenu.
+Used by the [Configuration](pages/config.md) screen to verify the token.
 
 ---
 
-### Wyszukiwanie po IPN
+### Search by IPN
 
 ```http
 GET /api/parts?ipn={ipn}
 ```
 
-**Odpowiedź:**
+**Response:**
 ```json
 {
   "hydra:member": [
-    { "id": 42, "name": "Rezystor 10k", "ipn": "1234567", ... }
+    { "id": 42, "name": "Resistor 10k", "ipn": "1234567", ... }
   ]
 }
 ```
 
-Używane gdy scanned/wpisany kod to dokładnie 7 cyfr.
+Used when the scanned/typed code is exactly 7 digits.
 
 ---
 
-### Wyszukiwanie po nazwie
+### Search by name
 
 ```http
 GET /api/parts?name={query}&itemsPerPage=100
 ```
 
-Zwraca max 100 wyników. Wyszukiwanie jest realizowane po stronie serwera (LIKE).
+Returns up to 100 results. The search is performed server-side (LIKE).
 
 ---
 
-### Pobieranie wszystkich części
+### Fetch all parts
 
 ```http
 GET /api/parts?itemsPerPage=100
 ```
 
-Aplikacja podąża za `hydra:view.hydra:next` aż do zebrania wszystkich rekordów (max **2000**). Używane przez Generator IPN i Inwentaryzację.
+The app follows `hydra:view.hydra:next` until it has collected every record (max **2000**). Used by the IPN Generator and Stock Taking.
 
 ---
 
-### Szczegóły części
+### Part details
 
 ```http
 GET /api/parts/{id}
 ```
 
-**Odpowiedź (fragment):**
+**Response (excerpt):**
 ```json
 {
   "id": 42,
-  "name": "Rezystor 10k",
+  "name": "Resistor 10k",
   "ipn": "1234567",
   "minamount": 10,
   "description": "...",
@@ -119,17 +119,17 @@ GET /api/parts/{id}
     { "id": 7, "amount": 12.0, "storageLocation": "/api/storage_locations/2" }
   ],
   "parameters": [
-    { "id": 101, "name": "Wartość", "value": "10k", "unit": "Ω" }
+    { "id": 101, "name": "Value", "value": "10k", "unit": "Ω" }
   ]
 }
 ```
 
 !!! note
-    Pola `category`, `manufacturer`, `storageLocation` są IRI-ami (referencjami). Aplikacja pobiera nazwy przez osobne żądania lub parsuje z osadzonych obiektów.
+    The `category`, `manufacturer` and `storageLocation` fields are IRIs (references). The app resolves the names through separate requests or by parsing embedded objects.
 
 ---
 
-### Aktualizacja partii magazynowej
+### Update a storage lot
 
 ```http
 PATCH /api/part_lots/{id}
@@ -137,15 +137,15 @@ Content-Type: application/merge-patch+json
 
 {
   "amount": 15,
-  "description": "Opcjonalny komentarz"
+  "description": "Optional comment"
 }
 ```
 
-**Odpowiedź 200:** zaktualizowany obiekt `PartLot`.
+**200 response:** the updated `PartLot` object.
 
 ---
 
-### Aktualizacja parametru
+### Update a parameter
 
 ```http
 PATCH /api/part_parameters/{id}
@@ -158,7 +158,7 @@ Content-Type: application/merge-patch+json
 
 ---
 
-### Nadanie IPN
+### Assign an IPN
 
 ```http
 PATCH /api/parts/{id}
@@ -171,19 +171,19 @@ Content-Type: application/merge-patch+json
 
 ---
 
-### Pobieranie kategorii
+### Fetch categories
 
 ```http
 GET /api/categories?itemsPerPage=200
 ```
 
-Aplikacja pobiera do **200** kategorii stronicując przez `hydra:next`. Używane przez [Przeglądarkę kategorii](pages/category-browser.md).
+The app fetches up to **200** categories, paging through `hydra:next`. Used by the [Category browser](pages/category-browser.md).
 
-**Odpowiedź (fragment):**
+**Response (excerpt):**
 ```json
 {
   "hydra:member": [
-    { "id": 1, "name": "Rezystory", "parent": null },
+    { "id": 1, "name": "Resistors", "parent": null },
     { "id": 2, "name": "SMD", "parent": "/api/categories/1" }
   ]
 }
@@ -191,17 +191,17 @@ Aplikacja pobiera do **200** kategorii stronicując przez `hydra:next`. Używane
 
 ---
 
-### Pobieranie typów załączników
+### Fetch attachment types
 
 ```http
 GET /api/attachment_types?itemsPerPage=1
 ```
 
-Pobiera pierwszy dostępny typ załącznika do użycia przy uploadzie zdjęcia.
+Fetches the first available attachment type to use when uploading a photo.
 
 ---
 
-### Upload załącznika (zdjęcie)
+### Upload an attachment (photo)
 
 ```http
 POST /api/attachments
@@ -209,32 +209,32 @@ Content-Type: application/ld+json
 Authorization: Bearer <token>
 
 {
-  "name": "Zdjęcie - Rezystor 10k",
+  "name": "Photo - Resistor 10k",
   "element": "/api/parts/42",
   "uploadFile": "data:image/jpeg;base64,/9j/4AAQSkZJRgAB...",
   "attachment_type": "/api/attachment_types/1"
 }
 ```
 
-**Odpowiedź 201:** obiekt załącznika.
+**201 response:** the attachment object.
 
-Zdjęcie jest pobierane z aparatu lub galerii, kompresowane do JPEG i kodowane base64 bezpośrednio w body żądania.
+The photo is taken from the camera or gallery, compressed to JPEG and base64-encoded directly in the request body.
 
 ---
 
-## Obsługa błędów
+## Error handling
 
-Aplikacja parsuje odpowiedzi błędów w następującej kolejności:
+The app parses error responses in the following order:
 
-1. Pole `hydra:description`
-2. Tablica `violations[].message` (błędy walidacji)
-3. Pole `detail`
-4. Tekst statusu HTTP
+1. The `hydra:description` field
+2. The `violations[].message` array (validation errors)
+3. The `detail` field
+4. The HTTP status text
 
-Błędy wyświetlane są użytkownikowi przez `SnackBar`.
+Errors are shown to the user through a `SnackBar`.
 
 ```dart
-// Przykładowa odpowiedź błędu walidacji (422)
+// Example validation error response (422)
 {
   "@type": "ConstraintViolationList",
   "violations": [
