@@ -1,4 +1,7 @@
 site_name: PartDB Scanner
+site_url: https://bartkepl.github.io/partdb_scanner/
+repo_url: https://github.com/bartkepl/partdb_scanner
+edit_uri: edit/main/doc/docs/
 site_description: Dokumentacja aplikacji mobilnej PartDB Scanner – skaner i menedżer komponentów elektronicznych
 site_author: bartkepl
 docs_dir: docs
